@@ -1,0 +1,6 @@
+.inputContainer input:invalid{
+    border: 7px solid red;
+}
+.inputContainer input:valid{
+    border: 7px solid green;
+}
