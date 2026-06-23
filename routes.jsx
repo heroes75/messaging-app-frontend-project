@@ -1,4 +1,5 @@
 import App from "./src/App";
+import Conversations from "./src/Conponents/Conversations";
 import LoginPage from "./src/Conponents/LoginPage";
 import SignupPage from "./src/Conponents/SignupPage";
 
@@ -6,7 +7,14 @@ import SignupPage from "./src/Conponents/SignupPage";
 const routes = [
     {
         element: <App/>,
-        path: '/'
+        path: '/',
+        children: [
+            {
+                element: <Conversations/>,
+                path: '/conversation'
+            }
+        ]
+
     },
     {
         path: '/signup',

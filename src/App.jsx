@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import socket from "./socket";
-import { useNavigate } from "react-router";
+import { Link, Outlet, useNavigate } from "react-router";
 
 function App() {
     const [user, setUser] = useState()
@@ -25,8 +25,16 @@ function App() {
     return (
         <>
             <nav>
-                
+                <ul>
+                    <li><Link to={`/conversation`}>conversations</Link></li>
+                    <li><Link to={`/friendship`}>Friends</Link></li>
+                    <li><Link to={`/profile`}>Profile</Link></li>
+                    <li><Link to={`/notification`}>Notifications</Link></li>
+                </ul>
             </nav>
+            <div className="details">
+                <Outlet/>
+            </div>
             <h1>Our First Test</h1>;
         </>
     );
