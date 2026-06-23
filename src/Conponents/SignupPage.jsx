@@ -10,7 +10,7 @@ function SignupPage() {
     const [backendMsgError, setBackendMsgError] = useState([])
     const form = useRef(null)
     const navigate = useNavigate()
-    const isUsernameAlphaNumeric = /\w+/g.test(username)
+    const isUsernameAlphaNumeric = /^[^\W]+$/g.test(username)
     const isUsernameOverflowThree = username.length >=3
     const isPasswordContainsOneLowerCase = /[a-z]+/g.test(password)
     const isPasswordContainsOneUpperCase = /[A-Z]+/g.test(password)
@@ -55,7 +55,7 @@ function SignupPage() {
             then(res => res.json()).
             then(res => {
                 if(res.msg) return setBackendMsgError(res.msg)
-                navigate('/login')
+                navigate('/login?issignup=true')
             })
     }
 

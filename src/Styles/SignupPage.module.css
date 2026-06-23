@@ -1,6 +1,6 @@
-.inputContainer input:invalid{
+.inputContainer input:focus:invalid{
     border: 7px solid red;
 }
-.inputContainer input:valid{
+.inputContainer input:focus:valid{
     border: 7px solid green;
 }
