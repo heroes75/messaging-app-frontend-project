@@ -66,7 +66,7 @@ function SignupPage() {
                 <form ref={form}>
                     <ul>
                         {msgError.map(error => error.status || <li key={error.msg} style={{color: 'red'}}>{error.msg}</li>)}
-                        {backendMsgError.map(msg => <li>{msg}</li>)}
+                        {backendMsgError.map(msg => <li key={msg}>{msg}</li>)}
                     </ul>
                     <div className={styles.inputContainer}>
                         <label htmlFor="username">Enter your username</label>

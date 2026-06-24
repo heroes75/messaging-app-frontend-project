@@ -26,7 +26,7 @@ function App() {
         <>
             <nav>
                 <ul>
-                    <li><Link to={`/conversation`}>conversations</Link></li>
+                    <li><Link to={`/conversation`}>Conversations</Link></li>
                     <li><Link to={`/friendship`}>Friends</Link></li>
                     <li><Link to={`/profile`}>Profile</Link></li>
                     <li><Link to={`/notification`}>Notifications</Link></li>
@@ -35,7 +35,6 @@ function App() {
             <div className="details">
                 <Outlet/>
             </div>
-            <h1>Our First Test</h1>;
         </>
     );
 }

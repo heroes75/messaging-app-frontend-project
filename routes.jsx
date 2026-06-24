@@ -1,7 +1,8 @@
 import App from "./src/App";
-import Conversations from "./src/Conponents/Conversations";
-import LoginPage from "./src/Conponents/LoginPage";
-import SignupPage from "./src/Conponents/SignupPage";
+import Conversations from "./src/Components/Conversations";
+import Friendship from "./src/Components/Friendship";
+import LoginPage from "./src/Components/LoginPage";
+import SignupPage from "./src/Components/SignupPage";
 
 
 const routes = [
@@ -12,7 +13,11 @@ const routes = [
             {
                 element: <Conversations/>,
                 path: '/conversation'
-            }
+            },
+            {
+                element: <Friendship/>,
+                path: '/friendship'
+            },
         ]
 
     },

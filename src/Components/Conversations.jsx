@@ -17,7 +17,7 @@ export default function Conversations() {
 
     return (
         <>
-            <ul>{conversations.map(conversation => <li>{conversation.participants[0].user.username}</li>)}</ul>
+            <ul>{conversations.map(conversation => <li key={conversation.id}>{conversation.participants[0].user.username}</li>)}</ul>
         </>
     )
 }
