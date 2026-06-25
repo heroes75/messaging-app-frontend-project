@@ -1,7 +1,7 @@
 import { screen, render } from "@testing-library/react";
 import { describe, test, expect, vi } from "vitest";
 import { createMemoryRouter, RouterProvider } from "react-router";
-import SignupPage from "../Conponents/SignupPage";
+import SignupPage from "../Components/SignupPage";
 import userEvent from "@testing-library/user-event";
 import routes from '../../routes'
 
