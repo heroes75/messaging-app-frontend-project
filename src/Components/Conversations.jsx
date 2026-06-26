@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Outlet } from "react-router";
 
 export default function Conversations() {
     const [conversations, setConversation] = useState([]) 
@@ -18,6 +19,9 @@ export default function Conversations() {
     return (
         <>
             <ul>{conversations.map(conversation => <li key={conversation.id}>{conversation.participants[0].user.username}</li>)}</ul>
+            <div>
+                {Outlet}
+            </div>
         </>
     )
 }

@@ -14,7 +14,12 @@ const routes = [
         children: [
             {
                 element: <Conversations/>,
-                path: '/conversation'
+                path: '/conversation',
+                children: [
+                    {
+                        element: ''
+                    }
+                ]
             },
             {
                 element: <Friendship/>,

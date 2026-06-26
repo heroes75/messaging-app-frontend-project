@@ -39,7 +39,7 @@ function App() {
 
     return (
         <>
-            <SearchComponent />
+            <SearchComponent user={user} />
             <nav>
                 <ul>
                     <li><Link to={`/conversation`}>Conversations</Link></li>

@@ -17,7 +17,6 @@ export default function ProfilePage() {
     const {profileId} = useParams()
 
     useEffect(() => {
-        console.log(window.location.href)
         console.log('profileId:', profileId)
         fetch(`${import.meta.env.VITE_API_URL}/profile/${profileId}`, {
             method: 'GET',

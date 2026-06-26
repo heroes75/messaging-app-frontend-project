@@ -28,14 +28,80 @@ export default function SearchComponent() {
         })
     }
 
+    function requestFriend(friendId) {
+        fetch(`${import.meta.env.VITE_API_URL}/friendship`, {
+            method: 'POST',
+            headers: {
+                authorization: `Bearer ${localStorage.getItem('token')}`,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({friendId})
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log('res.friendship', res.friendship)
+
+        })
+        .catch(err => console.error(err))
+    }
+
+    function openConversations(participantId) {
+        fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
+            method: 'POST',
+            headers: {
+                authorization: `bearer ${localStorage.getItem('token')}`,
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({participantId})
+        })
+        .then(res => res.json())
+        .then(res => {
+            console.log('res:', res.conversation)
+            // setUsers(users.map(user => {
+            //     if(res.conversation.participants.find(participant => participant.id == user.id)) {
+            //         user.conversations
+            //     }
+            // }))
+        })
+    }
+
     return (
-        <>  
-            {msgError.map(error => error.msg)}
+        <>
+            {msgError.map((error) => error.msg)}
             <label htmlFor="user">Search your friend: </label>
-            <input type="search" name="user" id="user" value={input} onChange={search} />
-            <ul >
-                {users.map(user => <li value={user.username}><Link to={`/profile/${user.profile.id}`}>{user.username}</Link></li>)}
+            <input
+                type="search"
+                name="user"
+                id="user"
+                value={input}
+                onChange={search}
+            />
+            <ul>
+                {users.map((user) => (
+                    <li value={user.username}>
+                        <Link to={`/profile/${user.profile.id}`}>
+                            {user.username}
+                        </Link>{" "}
+                        <span>
+                            {user.friendFirst.length === 0 &&
+                            user.friendSecond.length === 0 ? (
+                                <button onClick={() => requestFriend(user.id)}>
+                                    req.
+                                </button>
+                            ) : user.friendFirst.length !== 0 ? (
+                                user.friendFirst[0].status
+                            ) : (
+                                user.friendSecond[0].status
+                            )}
+                        </span>
+                        <span>
+                            {
+                                user.conversations.length === 0 ? <button onClick={() => openConversations(user.id)}>Open Chat</button> : <Link to={`/conversation/${user.conversations[0].conversationId}`}>chat</Link>
+                            }
+                        </span>
+                    </li>
+                ))}
             </ul>
         </>
-    )
+    );
 }
