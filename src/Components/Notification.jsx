@@ -6,7 +6,7 @@ export default function Notifications() {
     const [isError, setIsError] = useState(false)
     useEffect(() => {
         const bearer = `Bearer ${localStorage.getItem('token')}`
-        fetch(`${import.meta.env.VITE_API_URL}/notifications`, {
+        fetch(`${import.meta.env.VITE_API_URL}/notification`, {
             method: 'GET',
             headers: {
                 authorization: bearer,
@@ -14,6 +14,7 @@ export default function Notifications() {
         })
         .then(res => res.json())
         .then(res => {
+            console.log('res.notifications:', res.notifications)
             setNotifications(res.notifications)
         })
         .catch(err => {

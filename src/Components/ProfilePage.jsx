@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router";
 
 
 export default function ProfilePage() {
@@ -13,10 +14,12 @@ export default function ProfilePage() {
     const [isError, setIsError] = useState(false)
     const [statusUpdate , setStatusUpdate] = useState(false)
     const dialog = useRef()
+    const {profileId} = useParams()
 
     useEffect(() => {
         console.log(window.location.href)
-        fetch(`${import.meta.env.VITE_API_URL}${window.location.pathname}`, {
+        console.log('profileId:', profileId)
+        fetch(`${import.meta.env.VITE_API_URL}/profile/${profileId}`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${localStorage.getItem('token')}`
@@ -39,7 +42,7 @@ export default function ProfilePage() {
                 setIsError(true)
             })
             .finally(() => setIsLoading(false))
-    },[])
+    },[profileId])
 
     function ShowDialog() {
         dialog.current.show()

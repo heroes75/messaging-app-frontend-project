@@ -2,6 +2,7 @@ import App from "./src/App";
 import Conversations from "./src/Components/Conversations";
 import Friendship from "./src/Components/Friendship";
 import LoginPage from "./src/Components/LoginPage";
+import Notifications from "./src/Components/Notification";
 import ProfilePage from "./src/Components/ProfilePage";
 import SignupPage from "./src/Components/SignupPage";
 
@@ -21,7 +22,11 @@ const routes = [
             },
             {
                 element: <ProfilePage/>,
-                path: 'profile/:ProfileId'
+                path: 'profile/:profileId'
+            },
+            {
+                element: <Notifications/>,
+                path: '/notification'
             }
         ]
 

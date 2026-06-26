@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import socket from "./socket";
 import { Link, Outlet, useNavigate } from "react-router";
+import SearchComponent from "./Components/SearchComponents";
 
 function App() {
     const [user, setUser] = useState({})
@@ -17,11 +18,12 @@ function App() {
                 authorization: `Bearer ${localStorage.getItem("token")}`,
             },
         })
-            .then((res) => res.json())
             .then((res) => {
-                console.log('res.user:', res.user)
+                if(res.status === 303) return navigate('/login')
+                return res.json()
+            })
+            .then((res) => {
                 if (!res.user) return navigate("/login");
-                console.log('res.user:', res.user)
                 setUser(res.user)
             })
             .catch(error => {
@@ -37,6 +39,7 @@ function App() {
 
     return (
         <>
+            <SearchComponent />
             <nav>
                 <ul>
                     <li><Link to={`/conversation`}>Conversations</Link></li>
