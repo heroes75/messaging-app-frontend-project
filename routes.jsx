@@ -2,6 +2,7 @@ import App from "./src/App";
 import Conversations from "./src/Components/Conversations";
 import Friendship from "./src/Components/Friendship";
 import LoginPage from "./src/Components/LoginPage";
+import Messages from "./src/Components/Messages";
 import Notifications from "./src/Components/Notification";
 import ProfilePage from "./src/Components/ProfilePage";
 import SignupPage from "./src/Components/SignupPage";
@@ -17,7 +18,8 @@ const routes = [
                 path: '/conversation',
                 children: [
                     {
-                        element: ''
+                        element: <Messages/>,
+                        path: ':conversationId'
                     }
                 ]
             },

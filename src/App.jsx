@@ -49,7 +49,7 @@ function App() {
                 </ul>
             </nav>
             <div className="details">
-                <Outlet/>
+                <Outlet context={user}/>
             </div>
         </>
     );
