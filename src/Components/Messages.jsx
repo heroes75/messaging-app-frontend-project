@@ -4,6 +4,7 @@ import styles from '../Styles/Message.module.css'
 
 export default function Messages() {
     const [message, setMessage] = useState('')
+    const [files, setFiles] = useState()
     const [conversation, setConversation] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
@@ -43,6 +44,12 @@ export default function Messages() {
     function handleMessage(e) {
         setMessage(e.target.value)
     }
+    
+    function handleFiles(e) {
+        console.log('e.target.files:', e.target.files[0])
+        console.log('e.target.files:', URL.createObjectURL(e.target.files[0]))
+        setFiles(e.target.files[0])
+    }
 
     function sendMessage() {
         fetch(`${import.meta.env.VITE_API_URL}/conversation/${conversationId}/messages`, {
@@ -72,7 +79,11 @@ export default function Messages() {
                     conversation.messages.map(message => <li className={user.id === message.userId ? styles.right : styles.left} ><span>{message.message} </span><span> {new Intl.DateTimeFormat(undefined, {hour: '2-digit', minute: '2-digit'}).format(new Date(message.createdAt))}</span></li>)
                 }
             </ul>
+             <label htmlFor="file">
+                <input onChange={handleFiles} type="file" name="file" id="file" />
+            </label>
             <label htmlFor="message">
+                <img style={{width: '100px'}} src={files ? URL.createObjectURL(files) : null} alt="" />
                 <textarea value={message} onChange={handleMessage} onKeyDown={autoSize} className={styles.textarea} name="message" id="message" ></textarea>
             </label>
             <button onClick={sendMessage} disabled={message === ''}>send</button>
