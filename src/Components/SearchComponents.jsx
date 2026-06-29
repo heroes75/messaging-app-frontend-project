@@ -40,7 +40,14 @@ export default function SearchComponent() {
         .then(res => res.json())
         .then(res => {
             console.log('res.friendship', res.friendship)
-
+            setUsers(users.map(user => {
+                if(user.id === friendId) {
+                    if (user.friendFirst.length !== 0) {
+                        user.friendFirst[0].status = res.friendship.status
+                    }
+                }
+                return user
+            }))
         })
         .catch(err => console.error(err))
     }
@@ -57,11 +64,12 @@ export default function SearchComponent() {
         .then(res => res.json())
         .then(res => {
             console.log('res:', res.conversation)
-            // setUsers(users.map(user => {
-            //     if(res.conversation.participants.find(participant => participant.id == user.id)) {
-            //         user.conversations
-            //     }
-            // }))
+            setUsers(users.map(user => {
+                if(res.conversation.participants.find(participant => participant.id == user.id)) {
+                    user.conversations = res.conversation.participants[0].userId === user.id ? res.conversation.participants[0] : res.conversation.participants[1]
+                }
+                return user
+            }))
         })
     }
 
