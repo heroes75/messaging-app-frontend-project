@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useOutletContext, useParams } from "react-router";
 import styles from '../Styles/Message.module.css'
 
+
+const url = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/upload`
+
 export default function Messages() {
     const [message, setMessage] = useState('')
     const [files, setFiles] = useState()
@@ -47,18 +50,30 @@ export default function Messages() {
     
     function handleFiles(e) {
         console.log('e.target.files:', e.target.files[0])
-        console.log('e.target.files:', URL.createObjectURL(e.target.files[0]))
+        console.log('files', files)
         setFiles(e.target.files[0])
     }
 
-    function sendMessage() {
+    async function sendMessage() {
+        let file
+        if (files) {
+            console.log("files:", files);
+            const formData = new FormData();
+            formData.append("file", files);
+            formData.append("upload_preset", "messaging_app");
+            file = await fetch(url, {
+                method: "POST",
+                body: formData,
+            }).then((res) => res.json());
+        }
+        console.log('image:', file)
         fetch(`${import.meta.env.VITE_API_URL}/conversation/${conversationId}/messages`, {
             method: 'POST',
             headers: {
                 authorization: `Bearer ${localStorage.getItem('token')}`,
                 'content-type': 'application/json'
             },
-            body: JSON.stringify({message})
+            body: JSON.stringify({message, file})
         })
         .then(res => res.json())
         .then(res => {
@@ -75,20 +90,54 @@ export default function Messages() {
     return (
         <>
             <ul className={styles.ul}>
-                {
-                    conversation.messages.map(message => <li className={user.id === message.userId ? styles.right : styles.left} ><span>{message.message} </span><span> {new Intl.DateTimeFormat(undefined, {hour: '2-digit', minute: '2-digit'}).format(new Date(message.createdAt))}</span></li>)
-                }
+                {conversation.messages.map((message) => (
+                    <li
+                        className={
+                            user.id === message.userId
+                                ? styles.right
+                                : styles.left
+                        }
+                    >
+                        <span>{message.message} </span>
+                        <span>
+                            {" "}
+                            {new Intl.DateTimeFormat(undefined, {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }).format(new Date(message.createdAt))}
+                        </span>{" "}
+                        {message.MessageAttachments.length !== 0 && <img style={{width: '300px'}} src={message.MessageAttachments[0].attachmentUrl} alt={message.MessageAttachments[0].attachmentName} />}
+                    </li>
+                ))}
             </ul>
-             <label htmlFor="file">
-                <input onChange={handleFiles} type="file" name="file" id="file" />
+            <label htmlFor="file">
+                <input
+                    onChange={handleFiles}
+                    type="file"
+                    name="file"
+                    id="file"
+                />
             </label>
             <label htmlFor="message">
-                <img style={{width: '100px'}} src={files ? URL.createObjectURL(files) : null} alt="" />
-                <textarea value={message} onChange={handleMessage} onKeyDown={autoSize} className={styles.textarea} name="message" id="message" ></textarea>
+                <img
+                    style={{ width: "100px" }}
+                    src={files ? URL.createObjectURL(files) : null}
+                    alt=""
+                />
+                <textarea
+                    value={message}
+                    onChange={handleMessage}
+                    onKeyDown={autoSize}
+                    className={styles.textarea}
+                    name="message"
+                    id="message"
+                ></textarea>
             </label>
-            <button onClick={sendMessage} disabled={message === ''}>send</button>
+            <button onClick={sendMessage} disabled={message === ""}>
+                send
+            </button>
         </>
-    )
+    );
 
     
 }
