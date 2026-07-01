@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router";
 import styles from '../Styles/Message.module.css'
 
@@ -7,12 +7,27 @@ const url = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/
 
 export default function Messages() {
     const [message, setMessage] = useState('')
+    const [msgError, setMsgError] = useState([])
     const [files, setFiles] = useState()
     const [conversation, setConversation] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
+    const [isSending, setIsSending] = useState(false)
+    const inputFiles = useRef()
     const user = useOutletContext()
     const {conversationId} = useParams()
+    const fileTypes = [
+        "image/apng",
+        "image/bmp",
+        "image/gif",
+        "image/jpeg",
+        "image/pjpeg",
+        "image/png",
+        "image/svg+xml",
+        "image/tiff",
+        "image/webp",
+        "image/x-icon",
+    ];
 
 
     useEffect(() => {
@@ -54,13 +69,25 @@ export default function Messages() {
         setFiles(e.target.files[0])
     }
 
-    async function sendMessage() {
+    function deleteFile() {
+        setFiles(null)
+        inputFiles.current.value = ''
+    }
+
+    async function sendMessage(e) {
+        setIsSending(true)
+        const cpMsgError = []
+        e.preventDefault()
         let file
         if (files) {
             console.log("files:", files);
+            if(!fileTypes.includes(files.type)) return setMsgError(cpMsgError.concat(['file type isn\'t valid']))
+            if(files.size > 50 * 1e6) {
+                return setMsgError(cpMsgError.concat(['file size is too high']))
+            }
             const formData = new FormData();
             formData.append("file", files);
-            formData.append("upload_preset", "messaging_app");
+            formData.append("upload_preset", import.meta.env.VITE_UPLOAD_PRESET);
             file = await fetch(url, {
                 method: "POST",
                 body: formData,
@@ -78,9 +105,13 @@ export default function Messages() {
         .then(res => res.json())
         .then(res => {
             console.log(res.message)
+            inputFiles.current.value = '',
+            setFiles(null)
             setMessage('')
             setConversation({...conversation, messages: [...conversation.messages, res.message]})
         })
+        .catch(err => console.error(err))
+        .finally(() => setIsSending(false))
     }
 
 
@@ -97,6 +128,7 @@ export default function Messages() {
                                 ? styles.right
                                 : styles.left
                         }
+                        key={message.id}
                     >
                         <span>{message.message} </span>
                         <span>
@@ -106,36 +138,43 @@ export default function Messages() {
                                 minute: "2-digit",
                             }).format(new Date(message.createdAt))}
                         </span>{" "}
-                        {message.MessageAttachments.length !== 0 && <img style={{width: '300px'}} src={message.MessageAttachments[0].attachmentUrl} alt={message.MessageAttachments[0].attachmentName} />}
+                        {message.MessageAttachments.length !== 0 && <div><img style={{width: '300px'}} src={message.MessageAttachments[0].attachmentUrl} alt={message.MessageAttachments[0].attachmentName} /></div>}
                     </li>
                 ))}
             </ul>
-            <label htmlFor="file">
-                <input
-                    onChange={handleFiles}
-                    type="file"
-                    name="file"
-                    id="file"
-                />
-            </label>
-            <label htmlFor="message">
-                <img
-                    style={{ width: "100px" }}
-                    src={files ? URL.createObjectURL(files) : null}
-                    alt=""
-                />
-                <textarea
-                    value={message}
-                    onChange={handleMessage}
-                    onKeyDown={autoSize}
-                    className={styles.textarea}
-                    name="message"
-                    id="message"
-                ></textarea>
-            </label>
-            <button onClick={sendMessage} disabled={message === ""}>
-                send
-            </button>
+            <form>
+                <label htmlFor="file">
+                    {msgError.map(msg => msg)}
+                    <input
+                        onChange={handleFiles}
+                        type="file"
+                        ref={inputFiles}
+                        name="file"
+                        id="file"
+                    />
+                </label>
+                <label htmlFor="message">
+                    {files && <div>
+                        <img
+                            style={{ width: "100px" }}
+                            src={files ? URL.createObjectURL(files) : null}
+                            alt=""
+                        />
+                         <button onClick={deleteFile}>Delete Image</button>
+                    </div>}
+                    <textarea
+                        value={message}
+                        onChange={handleMessage}
+                        onKeyDown={autoSize}
+                        className={styles.textarea}
+                        name="message"
+                        id="message"
+                    ></textarea>
+                </label>
+                <button onClick={sendMessage} disabled={message === "" || isSending}>
+                    {isSending ? 'Sending...' : 'Send' }
+                </button>
+            </form>
         </>
     );
 

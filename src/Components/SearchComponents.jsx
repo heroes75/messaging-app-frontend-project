@@ -41,7 +41,9 @@ export default function SearchComponent() {
         .then(res => {
             console.log('res.friendship', res.friendship)
             setUsers(users.map(user => {
+                console.log('user.id === friendId: out', user.id === friendId)
                 if(user.id === friendId) {
+                    console.log('user.id === friendId: IN', user.id === friendId)
                     if (user.friendFirst.length !== 0) {
                         user.friendFirst[0].status = res.friendship.status
                     }
@@ -53,6 +55,7 @@ export default function SearchComponent() {
     }
 
     function openConversations(participantId) {
+        console.log('participantId:', participantId)
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
             method: 'POST',
             headers: {

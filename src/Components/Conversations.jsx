@@ -14,6 +14,7 @@ export default function Conversations() {
         })
             .then(res => res.json())
             .then(res => {
+                console.log('res.conversations:', res.conversations)
                 setConversation(res.conversations)
             })
     }, [])
