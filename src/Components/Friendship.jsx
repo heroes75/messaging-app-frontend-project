@@ -25,7 +25,7 @@ export default function Friendship() {
             })
     }, [])
 
-    function handleRequest(friendshipStatus, friendId) {
+    function handleRequest(friendshipStatus, friendId, isInFirst) {
         console.log('import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL)
         fetch(`${import.meta.env.VITE_API_URL}/friendship/${friendId}`, {
             method: 'PUT',
@@ -39,15 +39,21 @@ export default function Friendship() {
         .then(res => {
             const friendship = res.friendship
             console.log('res,friendship:', res.friendship)
-            if (friendship.friendFirst) {
+            console.log('friendship.friendFirst:', friendship.friendFirst)
+            // if (friendship.friendFirst) {
                 setFriendsFirst(friendsFirst.map(friend => {
-                    if(friendship.id === friend.id) return friendship
+                    console.log('friend in first:', friend)
+                    console.log('friendship.userIdOne === friend.userIdOne:', friendship.userIdOne === friend.userIdOne)
+                    if((friendship.userIdOne === friend.userIdOne)) return friendship
                     return friend
                 }))
-                return
-            }
+                // return
+            // }
+                
             setFriendsSecond(friendsSecond.map(friend => {
-                if(friendship.id === friend.id) return friendship
+                console.log('friend in second:', friend)
+                console.log('friendship.userIdTwo === friend.userIdTwo:', friendship.userIdTwo === friend.userIdTwo)
+                if((friendship.userIdTwo === friend.userIdTwo)) return friendship
                 return friend
             }))
         })

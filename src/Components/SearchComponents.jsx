@@ -8,8 +8,6 @@ export default function SearchComponent() {
     
     function search(e) {
         setInput(e.target.value)
-        console.log('e.target.value:', e.target.value)
-        console.log('`${import.meta.env.VITE_API_URL}/user?username=${e.target.value}:', `${import.meta.env.VITE_API_URL}/user?username=${e.target.value}`)
         fetch(`${import.meta.env.VITE_API_URL}/user?username=${e.target.value}`, {
             method: 'GET',
             headers: {
@@ -40,13 +38,12 @@ export default function SearchComponent() {
         .then(res => res.json())
         .then(res => {
             console.log('res.friendship', res.friendship)
+            const friendship = res.friendship
             setUsers(users.map(user => {
-                console.log('user.id === friendId: out', user.id === friendId)
-                if(user.id === friendId) {
-                    console.log('user.id === friendId: IN', user.id === friendId)
-                    if (user.friendFirst.length !== 0) {
-                        user.friendFirst[0].status = res.friendship.status
-                    }
+                if(user.id === friendship.userIdOne) {
+                    user.friendFirst = [friendship]
+                } else if (user.id === friendship.userIdTwo) {
+                    user.friendSecond = [friendship]
                 }
                 return user
             }))
@@ -68,8 +65,11 @@ export default function SearchComponent() {
         .then(res => {
             console.log('res:', res.conversation)
             setUsers(users.map(user => {
-                if(res.conversation.participants.find(participant => participant.id == user.id)) {
-                    user.conversations = res.conversation.participants[0].userId === user.id ? res.conversation.participants[0] : res.conversation.participants[1]
+                console.log('user: in conversation', user)
+                console.log('res.conversation.participants.find(participant => participant.id == user.id):', res.conversation.participants.find(participant => participant.userId == user.id))
+                if(res.conversation.participants.find(participant => participant.userId === user.id)) {
+                    user.conversations = res.conversation.participants[0].userId === user.id ? [res.conversation.participants[0]] : [res.conversation.participants[1]]
+                    console.log('user.conversations:', user.conversations)
                 }
                 return user
             }))
