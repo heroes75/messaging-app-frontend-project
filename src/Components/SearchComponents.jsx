@@ -59,7 +59,7 @@ export default function SearchComponent() {
                 authorization: `bearer ${localStorage.getItem('token')}`,
                 'content-type': 'application/json',
             },
-            body: JSON.stringify({participantId})
+            body: JSON.stringify({participantsId: [participantId]})
         })
         .then(res => res.json())
         .then(res => {
