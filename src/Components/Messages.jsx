@@ -130,6 +130,7 @@ export default function Messages() {
                         }
                         key={message.id}
                     >
+                        <h4>{!conversation.isGroup ? '' : message.userId === user.id ? 'You' : message.user.username}</h4>
                         <span>{message.message} </span>
                         <span>
                             {" "}

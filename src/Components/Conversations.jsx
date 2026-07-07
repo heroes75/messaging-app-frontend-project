@@ -16,7 +16,7 @@ export default function Conversations() {
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
             method: 'GET',
             headers: {
-                authorization: `Bearer ${localStorage.getItem('token')}`
+                authorization: token
             }
         })
             .then(res => res.json())
@@ -45,6 +45,15 @@ export default function Conversations() {
             setName('')
     }
 
+    function openDialog(participantsObJ, name) {
+        const participants = participantsObJ.map(participant => participant.user)
+        console.log('participants:', participants)
+        setParticipantsId(participants)
+        setName(name)
+        setFriends(friends.filter(friend => !participants.some(participant => participant.id === friend.id )))
+        dialog.current.show()
+    }
+
     function createGroup() {
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
             method: 'POST',
@@ -65,30 +74,68 @@ export default function Conversations() {
     if(isLoading) return <h1>Loading spinner</h1>
 
     return (
-        <>  
+        <>
             <dialog ref={dialog}>
                 <label htmlFor="name">Group Name:</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} type="text" name="name" id="name" />
+                <input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    type="text"
+                    name="name"
+                    id="name"
+                />
                 <ul>
                     <li>Added Friend</li>
-                    {
-                        participantsId.map(participantId => <li>{participantId.username} <button onClick={() => removeFriend(participantId)}>remove</button></li>)
-                    }
+                    {participantsId.map((participantId) => (
+                        <li>
+                            {participantId.username}{" "}
+                            <button onClick={() => removeFriend(participantId)}>
+                                remove
+                            </button>
+                        </li>
+                    ))}
                 </ul>
                 <ul>
                     <li>friends</li>
-                    {
-                        friends.map(friend => <li>{friend.username} <button onClick={() => addFriend(friend)}>add</button></li>)
-                    }
+                    {friends.map((friend) => (
+                        <li>
+                            {friend.username}{" "}
+                            <button onClick={() => addFriend(friend)}>
+                                add
+                            </button>
+                        </li>
+                    ))}
                 </ul>
                 <button onClick={cancel}>cancel</button>
                 <button onClick={createGroup}>Create Group</button>
             </dialog>
             <button onClick={() => dialog.current.show()}>Add Group</button>
-            <ul>{conversations.map(conversation => <li key={conversation.id}><Link to={`/conversation/${conversation.id}`}>{conversation.isGroup ? conversation.name : conversation.participants[0].user.username}</Link></li>)}</ul>
+            <ul>
+                {conversations.map((conversation) => (
+                    <li key={conversation.id}>
+                        <Link to={`/conversation/${conversation.id}`}>
+                            {conversation.isGroup
+                                ? conversation.name
+                                : conversation.participants.filter(
+                                      (participant) =>
+                                          participant.userId !== user.id,
+                                  )[0].user.username}
+                        </Link>{" "}
+                        {conversation.participants.find(
+                            (participant) =>
+                                participant.userId === user.id &&
+                                participant.role === "ADMIN",
+                        ) && (
+                            <span>
+                                <button onClick={() => openDialog(conversation.participants, conversation.name)}>Edit</button> <button>Delete</button>
+                            </span>
+                        )}{" "}
+                    </li>
+                ))}
+            </ul>
             <div>
-                <Outlet context={user}/>
+                <Outlet context={user} />
             </div>
         </>
-    )
+    );
 }
