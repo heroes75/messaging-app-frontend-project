@@ -75,6 +75,7 @@ export default function Conversations() {
         })
         .then(res => res.json())
         .then(res => {
+            if(res.errors) return setMsgError(res.errors.map(error => error.msg))
             console.log('res.conversation:', res.conversation)
             setConversation(conversations.concat(res.conversation))
             cancel()
@@ -93,6 +94,7 @@ export default function Conversations() {
         })
         .then(res => res.json())
         .then(res => {
+            if(res.errors) return setMsgError(res.errors.map(error => error.msg))
             const conversationUpdated = res.conversation
             console.log('conversationUpdated:', conversationUpdated)
             setConversation(conversations.map(conversation => {

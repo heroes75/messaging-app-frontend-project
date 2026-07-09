@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import socket from "./socket";
+// import socket from "./socket";
 import { Link, Outlet, useNavigate } from "react-router";
 import SearchComponent from "./Components/SearchComponents";
+import { io } from "socket.io-client";
+import socket from "./socket";
 
 function App() {
     const [user, setUser] = useState({})
@@ -11,7 +13,16 @@ function App() {
     const [isError, setIsError] = useState(null)
 
     useEffect(() => {
+        // const socket =  io(import.meta.env.VITE_API_URL, {
+        //     autoConnect: false,
+        //     extraHeaders: {
+        //         authorization: `Bearer ${localStorage.getItem("token")}`
+        //     }
+        // })
         socket.connect();
+        socket.emit('try', 'new')
+        console.log('socket.connected:', socket.connected)
+        console.log('socket:', socket)
         fetch(`${import.meta.env.VITE_API_URL}`, {
             method: "GET",
             headers: {

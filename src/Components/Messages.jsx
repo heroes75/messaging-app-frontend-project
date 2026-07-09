@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useOutletContext, useParams } from "react-router";
 import styles from '../Styles/Message.module.css'
+import { io } from "socket.io-client";
+import socket from "../socket";
 
 
 const url = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUD_NAME}/upload`
@@ -52,7 +54,22 @@ export default function Messages() {
             .finally(() => setIsLoading(false));
     }, [conversationId])
 
-
+    useEffect(() => {
+        socket.connect()
+        console.log('socket in mesg:', socket)
+        // socket.on(`user:${user}`)
+    
+        socket.on(`message`, (message) => {
+            console.log('message:', message)
+            if(message.conversationId === conversation.id) setConversation({...conversation, messages: conversation.messages.concat(message)})
+            
+        })
+        return () => {
+            socket.disconnect()
+            socket.off(`message`)
+        }
+    }, [conversationId, conversation])
+     
     function autoSize(e) {
         const el = e.target
         el.style.cssText = 'height:auto; padding: 10px 0 0 0';
@@ -104,10 +121,11 @@ export default function Messages() {
         })
         .then(res => res.json())
         .then(res => {
-            console.log(res.message)
+            console.log('res.message coming:', res.message)
             inputFiles.current.value = '',
             setFiles(null)
             setMessage('')
+            socket.emit('message', res.message)
             setConversation({...conversation, messages: [...conversation.messages, res.message]})
         })
         .catch(err => console.error(err))
