@@ -12,6 +12,22 @@ function App() {
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(null)
 
+
+    useEffect(() => {
+        socket.connect();
+        socket.emit('try', 'new')
+        console.log('socket.connected:', socket.connected)
+        const updateUserNotification = (notifications) => {
+                    console.log('notifications:', notifications)
+                    setUser({...user, notifications: user.notifications.concat(notifications)})
+                }
+        socket.on('notifications', updateUserNotification)
+        return () => {
+            socket.off('notifications', updateUserNotification)
+            socket.disconnect()
+        }
+    })
+
     useEffect(() => {
         // const socket =  io(import.meta.env.VITE_API_URL, {
         //     autoConnect: false,
@@ -19,10 +35,7 @@ function App() {
         //         authorization: `Bearer ${localStorage.getItem("token")}`
         //     }
         // })
-        socket.connect();
-        socket.emit('try', 'new')
-        console.log('socket.connected:', socket.connected)
-        console.log('socket:', socket)
+        console.log('user:', user)
         fetch(`${import.meta.env.VITE_API_URL}`, {
             method: "GET",
             headers: {
@@ -34,6 +47,7 @@ function App() {
                 return res.json()
             })
             .then((res) => {
+                console.log('res.user: in App', res.user)
                 if (!res.user) return navigate("/login");
                 setUser(res.user)
             })
@@ -56,7 +70,7 @@ function App() {
                     <li><Link to={`/conversation`}>Conversations</Link></li>
                     <li><Link to={`/friendship`}>Friends</Link></li>
                     <li><Link to={`/profile/${user.profile.id}`}>Profile</Link></li>
-                    <li><Link to={`/notification`}>Notifications</Link></li>
+                    <li><Link to={`/notification`}>Notifications</Link> {user.notifications.length}</li>
                 </ul>
             </nav>
             <div className="details">

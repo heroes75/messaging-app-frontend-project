@@ -56,9 +56,10 @@ export default function Messages() {
 
     useEffect(() => {
         socket.connect()
-        console.log('socket in mesg:', socket)
+        console.log('socket in msg:', socket)
         // socket.on(`user:${user}`)
     
+        
         socket.on(`message`, (message) => {
             console.log('message:', message)
             if(message.conversationId === conversation.id) setConversation({...conversation, messages: conversation.messages.concat(message)})
@@ -125,7 +126,8 @@ export default function Messages() {
             inputFiles.current.value = '',
             setFiles(null)
             setMessage('')
-            socket.emit('message', res.message)
+            console.log('res.notifications:', res.notifications)
+            socket.emit('message', res.message, res.notifications)
             setConversation({...conversation, messages: [...conversation.messages, res.message]})
         })
         .catch(err => console.error(err))

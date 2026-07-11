@@ -1,9 +1,24 @@
 import {useState, useEffect} from "react";
+import socket from "../socket";
 
 export default function Notifications() {
     const [notifications, setNotifications] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
+
+    useEffect(() => {
+        socket.connect()
+        const updateNotification = notification => {
+            console.log('notification:', notification)
+            setNotifications(notifications => [notification].concat(notifications))
+        }
+        socket.on('notifications', updateNotification)
+
+        return () => {
+            socket.disconnect()
+            socket.off('notifications', updateNotification)
+        }
+    }, [])
     useEffect(() => {
         const bearer = `Bearer ${localStorage.getItem('token')}`
         fetch(`${import.meta.env.VITE_API_URL}/notification`, {
@@ -18,7 +33,7 @@ export default function Notifications() {
             setNotifications(res.notifications)
         })
         .catch(err => {
-            console.error('err:', err)
+            console.error(err)
             setIsError(err)
         })
         .finally(() => setIsLoading(false))
@@ -31,7 +46,7 @@ export default function Notifications() {
         <>
             <ul>
                 {
-                    notifications.map(notification => <li><span>{notification.notification}</span><span>{notification.createdAt}</span></li>)
+                    notifications.map(notification => <li><span>{notification.notification}</span> <span>{notification.createdAt}</span></li>)
                 }
             </ul>
         </>
