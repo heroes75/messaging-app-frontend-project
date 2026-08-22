@@ -16,7 +16,7 @@ function App() {
     useEffect(() => {
         socket.connect();
         socket.emit('try', 'new')
-        console.log('socket.connected:', socket.connected)
+        // console.log('socket.connected:', socket.connected)
         const updateUserNotification = (notifications) => {
                     console.log('notifications:', notifications)
                     setUser({...user, notifications: user.notifications.concat(notifications)})
@@ -63,7 +63,10 @@ function App() {
     if(isError) return <h1>{isError.message}</h1>
 
     return (
-        <>
+        <> 
+            <div>
+                {user.username}
+            </div>
             <SearchComponent user={user} />
             <nav>
                 <ul>

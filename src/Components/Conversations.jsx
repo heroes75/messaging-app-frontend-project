@@ -1,5 +1,7 @@
+import Peer from "peerjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useOutletContext } from "react-router";
+import createPeer from "../peerjsUtils/createPeer";
 
 const token = `Bearer ${localStorage.getItem('token')}`;
 
@@ -12,12 +14,21 @@ export default function Conversations() {
     const [name, setName] = useState('')
     const [isOpenToUpdate, setIsOpenToUpdate] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
-    const dialog = useRef()
-    const dialogDeleteGroup = useRef()
     const [friends, setFriends] = useState(user.friendFirst.concat(user.friendSecond))
     const [msgError, setMsgError] = useState([])
+    // const [peer, setPeer] = useState(new Peer(user.id , {
+    //     host: 'localhost',
+    //     path: '/peerjs',
+    //     port: 3001,
+    //     secure: false,
+    // }))
+    const [availableCall, setAvailableCall] = useState([])
+    // const participants = conversations?.participants?.filter(participant => participant?.user?.id === user.id)
+    // console.log('participants in conversations:', participants)
+    const dialog = useRef()
+    const dialogDeleteGroup = useRef()
     const isInsufficientParticipant = participantsId.length < 2
-    const isnameEmpty = name === ""
+    const isNameEmpty = name === ""
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
@@ -33,6 +44,15 @@ export default function Conversations() {
             })
             .finally(() => setIsLoading(false))
     }, [])
+
+    // useEffect(() => {
+    //     console.log('peer in conversation:', peer.id)
+    //     // peer.connect()
+
+    //     return () => {
+    //         peer.disconnect()
+    //     }
+    // }, [peer])
 
     function addFriend(obj) {
         setParticipantsId(participantsId.concat(obj))
@@ -138,7 +158,7 @@ export default function Conversations() {
             newMsgError.push('you need of two friend to create a group')
             setMsgError(newMsgError)
         }
-        if(isnameEmpty) {
+        if(isNameEmpty) {
             newMsgError.push('Your group need a name')
             setMsgError(newMsgError)
         }
@@ -148,6 +168,16 @@ export default function Conversations() {
             return true
         }
     }
+
+    // const videoCall = () => {
+    //     navigator.mediaDevices.getUserMedia({
+    //         audio: true,
+    //         video: true
+    //     }).then(stream => {
+    //         setLocalStream(stream);
+    //         peer.call()
+    //     })
+    // }
 
     if(isLoading) return <h1>Loading spinner</h1>
 
@@ -200,11 +230,14 @@ export default function Conversations() {
                 }
                 
             </dialog>
-            <button onClick={() => {dialog.current.show(); setIsOpenToUpdate(false)}}>Add Group</button>
+    
+            <button onClick={() => {dialog.current.show(); setIsOpenToUpdate(false); console.log('friends:', friends)}}>Add Group</button>
+            
             <ul>
-                {conversations.map((conversation) => (
-                    <li key={conversation.id}>
-                        <Link to={`/conversation/${conversation.id}`}>
+                {conversations.map((conversation) => {
+                    const participants = conversation.participants.filter(participant => participant.user.id !== user.id)
+                    return(<li key={conversation.id}>
+                        <Link to={`/conversation/${conversation.id}`} state={{ participants: participants }} >
                             {conversation.isGroup
                                 ? conversation.name
                                 : conversation.participants.filter(
@@ -222,10 +255,10 @@ export default function Conversations() {
                             </span>
                         )}{" "}
                     </li>
-                ))}
+                )})}
             </ul>
             <div>
-                <Outlet context={user} />
+                <Outlet context={{user}} />
             </div>
         </>
     );

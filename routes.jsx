@@ -6,6 +6,7 @@ import Messages from "./src/Components/Messages";
 import Notifications from "./src/Components/Notification";
 import ProfilePage from "./src/Components/ProfilePage";
 import SignupPage from "./src/Components/SignupPage";
+import Call from "./src/Components/Calls";
 
 
 const routes = [
@@ -19,7 +20,13 @@ const routes = [
                 children: [
                     {
                         element: <Messages/>,
-                        path: ':conversationId'
+                        path: ':conversationId',
+                        children: [
+                            {
+                                element: <Call />,
+                                path: '/conversation/:conversationId/video'
+                            }
+                        ]
                     }
                 ]
             },
