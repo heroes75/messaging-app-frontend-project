@@ -77,7 +77,7 @@ export default function Messages() {
     
         
         socket.on(`message`, (message) => {
-            console.log('message:', message)
+            // console.log('message:', message)
             if(message.conversationId === conversation.id) setConversation({...conversation, messages: conversation.messages.concat(message)})
             
         })
@@ -92,7 +92,7 @@ export default function Messages() {
         socket.on("response", (response) => {
             setResponseOfCall(response);
         });
-        console.log('isReceivingCall:', isReceivingCall)
+        // console.log('isReceivingCall:', isReceivingCall)
         return () => {
             socket.disconnect()
             socket.off(`message`)
@@ -116,8 +116,8 @@ export default function Messages() {
     }
     
     function handleFiles(e) {
-        console.log('e.target.files:', e.target.files[0])
-        console.log('files', files)
+        // console.log('e.target.files:', e.target.files[0])
+        // console.log('files', files)
         setFiles(e.target.files[0])
     }
 
@@ -132,7 +132,7 @@ export default function Messages() {
         e.preventDefault()
         let file
         if (files) {
-            console.log("files:", files);
+            // console.log("files:", files);
             if(!fileTypes.includes(files.type)) return setMsgError(cpMsgError.concat(['file type isn\'t valid']))
             if(files.size > 50 * 1e6) {
                 return setMsgError(cpMsgError.concat(['file size is too high']))
@@ -145,7 +145,7 @@ export default function Messages() {
                 body: formData,
             }).then((res) => res.json());
         }
-        console.log('image:', file)
+        // console.log('image:', file)
         fetch(`${import.meta.env.VITE_API_URL}/conversation/${conversationId}/messages`, {
             method: 'POST',
             headers: {
@@ -156,12 +156,12 @@ export default function Messages() {
         })
         .then(res => res.json())
         .then(res => {
-            console.log('res.message sending:', res.message)
+            // console.log('res.message sending:', res.message)
             inputFiles.current.value = '',
             setFiles(null)
             setMessage('')
-            console.log('res.notifications:', res.notifications)
-            socket.emit('message', res.message, res.notifications)
+            // console.log('res.notifications:', res.notifications)
+            // socket.emit('message', res.message, res.notifications)
             setConversation({...conversation, messages: [...conversation.messages, res.message]})
         })
         .catch(err => console.error(err))
@@ -173,7 +173,7 @@ export default function Messages() {
         const hash = Math.floor(Math.random() * 1000000000)
         socket.emit(`call`, hash, conversationId, {username: user.username, id: user.id})
         navigate(`/conversation/${conversationId}/video#${hash}`)
-        console.log('`/conversation/${conversationId}/video#${hash}`:', `/conversation/${conversationId}/video#${hash}`)
+        // console.log('`/conversation/${conversationId}/video#${hash}`:', `/conversation/${conversationId}/video#${hash}`)
         // navigator.mediaDevices.getUserMedia({
         //     audio: true,
         //     video: true,
@@ -209,7 +209,7 @@ export default function Messages() {
         socket.emit('responseCall', true, callerId)
         navigate(`/conversation/${conversationId}/video#${hash}`)
         setIsCalling(true)
-        console.log('isCalling:', isCalling)
+        // console.log('isCalling:', isCalling)
     }
 
     if(isLoading) return <h1>Loading Spinner...</h1>
@@ -223,7 +223,7 @@ export default function Messages() {
                     <button>Audio Call</button>
                 </div>
                 <div className="first" hidden={!isReceivingCall}>
-                    you're having a call
+                    {receiveCallMessage}
                     <button onClick={acceptCall}>Accept</button>
                     <button onClick={refuseCall}>Refuse</button>
                 </div>
@@ -288,7 +288,7 @@ export default function Messages() {
                 </form>
             </div>
             <div hidden={!isCalling}>
-                <Outlet context={{id: user.id, socket, conversationId, isCalling}}/>
+                <Outlet context={{id: user.id, socket, conversationId, isCalling, callerId}}/>
             </div>
         </>
     );

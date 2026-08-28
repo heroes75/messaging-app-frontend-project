@@ -3,24 +3,32 @@ import { useEffect, useMemo, useState } from "react"
 import { useRef } from "react"
 import { useNavigate, useOutletContext } from "react-router"
 import Video from "./Video"
+import createPeer from "../peerjsUtils/createPeer"
 
 export default function Call() {
     const localVideo = useRef()
     const [remotesVideos, setRemotesVideos] = useState([])
     const [streamState, setStreamState] = useState(null)
-    const {id, socket, conversationId, isCalling} = useOutletContext()
-    console.log('id:', id)
-    console.log('conversationId:', conversationId)
-    const peer = useMemo(() => new Peer(id, {
-                    port: 3001,
-                    path: "/peerjs",
-                    secure: false,
-                    host: "localhost",
-                }), [id])
+    const {id, socket, conversationId, isCalling, callerId} = useOutletContext()
+    // console.log('id:', id)
+    // console.log('conversationId:', conversationId)
+    // const peer = useMemo(() =>
+            //     new Peer(id, {
+            //     port: 3001,
+            //     path: "/peerjs",
+            //     secure: false,
+            //     host: "localhost",
+            // }),
+    //     [id],
+    // );
+    const [peer, setPeer] = useState()
+    const [peers, setPeers] = useState({})
+    // console.log('peers:', peers)
+    const peerRef = useRef(null)
     const navigate = useNavigate()
 
-    console.log('RemotesVideos out:', remotesVideos)
-    console.log('typeOf RemotesVideos out:', typeof remotesVideos)
+    // console.log('PeerRef out:', peerRef.current?.id)
+    // console.log('typeOf RemotesVideos out:', typeof remotesVideos)
 
 
     
@@ -28,90 +36,226 @@ export default function Call() {
     useEffect(() => {
         // console.log('peer-id first useEffect:', peer.id)
         // const peer2 = peer
-        console.log(
-            "window.URLPattern:",
-            window.location.pathname.replace(/\/video.*/, ""),
-        );
+        // console.log("window.URLPattern:", window.location.pathname.replace(/\/video.*/, ""));
+        console.log('PeerRef in first useEffevt:', peerRef.current?.id)
 
-        socket.emit("video-connected", conversationId, id);
+        
+
         const constraints = {
-            audio: false,
-            video: { width: 720, height: 720 },
+            audio: true,
+            video: true,
         };
-        function addVideoStream(video, stream) {
-            video.srcObject = stream;
-            video.addEventListener("loadedmetadata", () => {
-                video.play();
-            });
-        }
+        // function addVideoStream(video, stream) {
+        //     video.srcObject = stream;
+        //     video.addEventListener("loadedmetadata", () => {
+        //         video.play();
+        //     });
+        // }
+
+        let peerInstance = null
+        let localStream = null
         
         navigator.mediaDevices
             .getUserMedia(constraints)
             .then((stream) => {
-                function connectToNewUser(userId, stream, peer) {
-                    console.log("peer-id in connectToNewUser:", peer.id);
-                    const call = peer.call(userId, stream);
-                    console.log("call on connected user:", call);
-                    call.on("stream", (userStream) => {
-                        console.log("userStream in STREAM:", userStream);
-                        setRemotesVideos((prevRemotesVideos) => {
-                            console.log("remotesVideos in connectToNewUser stream:",remotesVideos);
-                            return [...prevRemotesVideos,userStream];
-                        });
-                    });
-                }
+                localStream = stream;
+                console.log("stream first mediadevices:", stream);
+                setStreamState(stream);
+
+                if (peerRef.current) peerRef.current.destroy();
+                const peer = new Peer(id, {
+                    host: "localhost",
+                    path: "/peerjs",
+                    port: 3001,
+                    secure: false,
+                });
+                peerInstance = peer;
+                peerRef.current = peer;
+
                 // setStreamState(stream);
-                // const peer = new Peer(id, {
-                //     port: 3001,
-                //     path: "/peerjs",
-                //     secure: false,
-                //     host: "localhost",
-                // });
-                // setPeer(peer);
-                // console.log('constraints:', constraints)
-                addVideoStream(localVideo.current, stream);
-                console.log("peer-id before call:", peer.id);
-                console.log("peer.id === peer2.id", peer.id);
+                //  if (!peer) {
+                // const peer = createPeer(id, setPeer)
+                // console.log('peer after cresate peer:', peer)
+
+                // addVideoStream(localVideo.current, stream);
+                // console.log("peer-id before call:", peer.id);
+                // console.log("peer.id === peer2.id", peer.id);
                 peer.on("call", (call) => {
-                    console.log("userStream in STREAM:", call);
+                    console.log("call in STREAM:", call);
                     call.answer(stream);
                     call.on("stream", (userStream) => {
-                         setRemotesVideos((prevRemotesVideos) => {
-                            // console.log("remotesVideos in connectToNewUser stream:",remotesVideos);
-                            return [...prevRemotesVideos,userStream];
+                        setRemotesVideos((prevRemotesVideos) => {
+                            // console.log("remotesVideos after call.answer:", [
+                            //     ...prevRemotesVideos,
+                            //     { remoteVideo: userStream, id: call.peer },
+                            // ]);
+                            const filtered = prevRemotesVideos.filter(video => video.id !== call.peer);
+                            return [
+                                ...filtered,
+                                { remoteVideo: userStream, id: call.peer },
+                            ];
                         });
                     });
-                    console.log('typeof remotesVideos:',typeof remotesVideos)
-                    // setRemotesVideos((remotesVideos) =>
-                    //     remotesVideos.push(stream),
-                    // );
+                });
+                peer.on("open", (peerId) => {
                     console.log(
-                        "remotesVideos in navigator call:",
-                        remotesVideos,
+                        "Peer successfully connected to server with ID:",
+                        peerId,
+                    );
+                    if (callerId !== id && callerId !== null) {
+                        console.log(
+                            "callerId !== id && callerId !== nul:",
+                            callerId !== id && callerId !== null,
+                        );
+                        socket.emit("video-connected", conversationId, id);
+                    }
+                });
+                peer.on("error", (err) => {
+                    console.error(
+                        "PeerJS Global Error:",
+                        err.type,
+                        err.message,
                     );
                 });
-                
-                socket.on("video-connected", (userId) => {
-                    console.log("userId:", userId);
-                    connectToNewUser(userId, stream, peer);
-                });
+
+                const videoDisconnected = (userId) => {
+                    setRemotesVideos((prev) => prev.filter((video) => video.id !== userId));
+                }
+
+                const videoConnected = (userId) => {
+                    console.log(
+                        "peerRef in connectToNewUser videoConnected:",
+                        peerRef.current.id,
+                    );
+                    console.log(
+                        '"video-connected", (userId):',
+                        "video-connected",
+                        userId,
+                    );
+                    // console.log('streamState:', streamState)
+                    // connectToNewUser(userId, streamState, peerRef.current);
+                    console.log(
+                        "peer.current in videoConnected:",
+                        peer.current,
+                    );
+                    console.log("!peer.current:", !peer.current);
+                    console.log("!localStream:", !localStream);
+                    console.log(
+                        "peerRef.current.destroyed:",
+                        peerRef.current.destroyed,
+                    );
+                    if (
+                        !peerRef.current ||
+                        !localStream ||
+                        peerRef.current.destroyed
+                    )
+                        return;
+                    const call = peerRef.current.call(userId, localStream);
+                    console.log("call:", call);
+                    call.on("stream", (userStream) => {
+                        setRemotesVideos((prev) => {
+                            const filtered = prev.filter(video => video.id !== userId);
+                            return [...filtered,{ remoteVideo: userStream, id: userId }]
+                        });
+                    });
+                };
+
+                socket.on("video-connected", videoConnected);
+                socket.on("video-disconnected", videoDisconnected);
             })
             .catch((error) => console.error(error));
-        // return () => {
-        //     peer.disconnect()
-        //     socket.off('video-connected')
-        // }
-    }, []);
+            
+        return () => {
+
+            console.log('peer in demount:', peer)
+            console.log('Démontage du composant : Nettoyage des sockets et du Peer');
+                socket.off("video-connected");
+                socket.emit('video-disconnected', conversationId, id)
+                setRemotesVideos([])
+                if (peerInstance) {
+                    peerInstance.disconnect()
+                    peerInstance.destroy()
+                    peerInstance.current = null;
+                }
+                
+                peerRef.current = null
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
+        }
+    }, [callerId, conversationId, id]);
 
     // useEffect(() => {
-       
-        
-    //     // socket.on("video-connected", (userId) => {
-    //     //             console.log("userId:", userId);
-    //     //             connectToNewUser(userId, streamState, peer);
-    //     //         });
-        
-    // }, [id, conversationId, peer, socket, streamState])
+    //     if (!streamState || !peerRef.current) return;
+    //     console.log('PeerRef in second useEffevt:', peerRef.current?.id)
+    //     console.log('callerId !== id && callerId !== null:', callerId !== id && callerId !== null)
+    //     // if (callerId !== id && callerId !== null) {
+    //     //     // console.log('is emitting !!!!!!!:', callerId !== id)
+    //     //     socket.emit("video-connected", conversationId, id);
+    //     // }
+    //     function connectToNewUser(userId, stream, peer) {
+    //         console.log('stream:', stream)
+    //         console.log('userId in debut od connectToNewUser:', userId)
+    //         console.log('peer in debut od connectToNewUser:', peer.id)
+    //         // peer.id = id
+    //         console.log('!peer:', !peer)
+    //         console.log('peer.disconnected:', peer.disconnected)
+    //         if (!peer || peer.disconnected) {
+    //             console.warn("Cannot call: Peer is disconnected from server.");
+    //             return;
+    //         }
+    //                 console.log('id in open:', id)
+    //                 const call = peer.call(userId, stream);
+    //                 console.log("call on connected user:", call);
+    //                 if (!call) {
+    //                     console.error('peer undefined')
+
+    //                     return
+    //                 }
+    //                 console.log('call created:', call)
+    //                 call.on("stream", (userStream) => {
+    //                 setRemotesVideos((prevRemotesVideos) => {
+    //                     console.log("remotesVideos after peer-call:", [
+    //                         ...prevRemotesVideos,
+    //                         { remoteVideo: userStream, id: userId },
+    //                     ]);
+    //                     return [
+    //                         ...prevRemotesVideos,
+    //                         { remoteVideo: userStream, id: userId },
+    //                     ];
+    //                 });
+    //                 })
+    //             }
+    //     const videoConnected = (userId) => {
+    //         console.log("peerRef in connectToNewUser videoConnected:", peerRef.current.id);
+    //         console.log(
+    //             '"video-connected", (userId):',
+    //             "video-connected",
+    //             userId,
+    //         );
+    //         // console.log('streamState:', streamState)
+    //         // connectToNewUser(userId, streamState, peerRef.current);
+    //         if(!peer.current || !localSteam || peerRef.current.destroyed) return
+    //         const call = peerRef.current.call(userId)
+    //         call.on('stream', userStream => {
+    //             setRemotesVideos((prev) => [
+    //                 ...prev,
+    //                 { remoteVideo: userStream, id: userId },
+    //             ]);
+    //         })
+    //     }
+
+    //     socket.on("video-connected", videoConnected);
+    //     return () => {
+    //         // socket.emit("video-disconnected", conversationId, id)
+    //         if(socket) {
+    //             socket.off("video-connected", videoConnected);
+    //             socket.close()
+    //             socket.disconnect()
+    //         }
+            
+    //     };
+    // }, [streamState]);
 
 
         if(!isCalling) {
@@ -122,12 +266,17 @@ export default function Call() {
 
     return (
         <>
-            <video style={{width: 300}} ref={localVideo}></video>
+            {/* <div className="videoContainer">
+                <video style={{width: 300}} ref={localVideo}></video>
+            </div> */}
+            <div className="videoContainer">
+                {streamState && <Video key={streamState.id} videoStream={{remoteVideo: streamState, id}}/>}
+            </div>
             <div className="remotesVideosBox">
                 {
                     remotesVideos.map(remoteVideo => {
-                        console.log(' typeof remoteVideo:', typeof remoteVideo)
-                        console.log('videoStream instanceof MediaStream:',remoteVideo instanceof MediaStream)
+                        console.log(' typeof remoteVideo:', remoteVideo)
+                        // console.log('videoStream instanceof MediaStream:',remoteVideo instanceof MediaStream)
                         return <Video  key={remoteVideo.id} videoStream={remoteVideo} />
                     })
                 }
