@@ -1,0 +1,26 @@
+.videoContainer {
+    position: relative;
+    align-self: center;
+    justify-self: center;
+}
+
+.username {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    left: 5px;
+    padding: 5px;
+    background-color: rgb(0, 0, 0, .5);
+    border-radius: 5px;
+}
+
+.buttonContainers {
+    position: absolute;
+    z-index: 2;
+    bottom: 10px;
+    left: 5px;
+}
+
+.buttonContainers button {
+    margin: 0 3px;
+}
