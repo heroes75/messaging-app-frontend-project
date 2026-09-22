@@ -19,7 +19,7 @@ export default function Messages() {
     const [isReceivingCall, setIsReceivingCall] = useState(false)
     const [responseOfCall, setResponseOfCall] = useState(false)
     const [receiveCallMessage, setReceiveCallMessage] = useState(null)
-    const [remotesVideosStream, setRemotesVideosStream] = useState(null)
+    const [isAllowCall, setIsAllowCall] = useState(false)
     const [isCalling, setIsCalling] = useState(false)
     const [hash, setHash] = useState('')
     const inputFiles = useRef()
@@ -61,7 +61,9 @@ export default function Messages() {
             .then((res) => res.json())
             .then((res) => {
                 setConversation(res.conversation);
+                setIsAllowCall(res.isAllowCall)
                 console.log('res.conversation:', res.conversation)
+                console.log('res.isAllowCall:', res.isAllowCall)
             })
             .catch((err) => {
                 console.error(err);
@@ -89,13 +91,14 @@ export default function Messages() {
             setHash(hash)
         })
 
-        socket.on("response", (response) => {
-            setResponseOfCall(response);
-        });
+        // socket.on("response", (response) => {
+        //     setResponseOfCall(response);
+        // });
         // console.log('isReceivingCall:', isReceivingCall)
         return () => {
             socket.disconnect()
             socket.off(`message`)
+            socket.off(`calling`)
         }
     }, [conversationId, conversation, isReceivingCall])
 
@@ -218,26 +221,24 @@ export default function Messages() {
     return (
         <>
             <div hidden={isCalling}>
-                <div>
-                    <button onClick={videoCall}>Video Call</button>
-                    <button>Audio Call</button>
-                </div>
-                <div className="first" hidden={!isReceivingCall}>
-                    {receiveCallMessage}
-                    <button onClick={acceptCall}>Accept</button>
-                    <button onClick={refuseCall}>Refuse</button>
-                </div>
-                <div>
-                    <p>{responseOfCall ? 'Your call has been accepted' : 'Your call has been refused'}</p>
-                </div>
+                {isAllowCall && <div className="callSection">
+                    <div>
+                        <button onClick={videoCall}>Video Call</button>
+                        <button>Audio Call</button>
+                    </div>
+                    <div className="first" hidden={!isReceivingCall}>
+                        {receiveCallMessage}
+                        <button onClick={acceptCall}>Accept</button>
+                        <button onClick={refuseCall}>Refuse</button>
+                    </div>
+                    <div>
+                        <p>{responseOfCall ? 'Your call has been accepted' : 'Your call has been refused'}</p>
+                    </div>
+                </div>}
                 <ul className={styles.ul}>
                     {conversation.messages.map((message) => (
-                        <li
-                            className={
-                                user.id === message.userId
-                                    ? styles.right
-                                    : styles.left
-                            }
+                        <li 
+                            className={ user.id === message.userId ? styles.right : styles.left}
                             key={message.id}
                         >
                             <h4>{!conversation.isGroup ? '' : message.userId === user.id ? 'You' : message.user.username}</h4>
@@ -288,7 +289,7 @@ export default function Messages() {
                 </form>
             </div>
             <div hidden={!isCalling}>
-                <Outlet context={{id: user.id, socket, conversationId, isCalling, callerId}}/>
+                <Outlet context={{id: user.id, socket, conversationId, isCalling, callerId, conversation}}/>
             </div>
         </>
     );
