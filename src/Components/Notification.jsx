@@ -1,10 +1,12 @@
 import {useState, useEffect} from "react";
 import socket from "../socket";
+import { useOutletContext } from "react-router";
 
 export default function Notifications() {
     const [notifications, setNotifications] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
+    const {user, setUser} = useOutletContext()
 
     useEffect(() => {
         socket.connect()
@@ -22,7 +24,7 @@ export default function Notifications() {
     useEffect(() => {
         const bearer = `Bearer ${localStorage.getItem('token')}`
         fetch(`${import.meta.env.VITE_API_URL}/notification`, {
-            method: 'GET',
+            method: 'PUT',
             headers: {
                 authorization: bearer,
             }
@@ -31,6 +33,7 @@ export default function Notifications() {
         .then(res => {
             console.log('res.notifications:', res.notifications)
             setNotifications(res.notifications)
+            setUser(user => ({...user, notifications}))
         })
         .catch(err => {
             console.error(err)
@@ -46,7 +49,7 @@ export default function Notifications() {
         <>
             <ul>
                 {
-                    notifications.map(notification => <li><span>{notification.notification}</span> <span>{notification.createdAt}</span></li>)
+                    notifications.map(notification => <li key={notification.id}><span>{notification.notification}</span> <span>{notification.createdAt}</span></li>)
                 }
             </ul>
         </>

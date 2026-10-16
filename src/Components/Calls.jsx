@@ -4,15 +4,14 @@ import { useRef } from "react"
 import { useNavigate, useOutletContext } from "react-router"
 import Video from "./Video"
 import createPeer from "../peerjsUtils/createPeer"
-import { set } from "@cloudinary/url-gen/actions/variable"
+import FallbackVideo from "./FallbackVideo"
 
 export default function Call() {
     const localVideo = useRef()
     const [remotesVideos, setRemotesVideos] = useState([])
     const [streamState, setStreamState] = useState(null)
-    const {id, socket, conversationId, isCalling, callerId, conversation} = useOutletContext()
-    const [othersParticipantsVideos, setOthersParticipantsVideos] = useState(conversation.participants.filter(participant => participant.userId !== id).map(participant => ({remoteVideo: null, id: participant.userId})))
-    console.log('othersParticipantsVideos:', othersParticipantsVideos)
+    const {id, socket, conversationId, isCalling, callerId, conversation, username} = useOutletContext()
+    const [othersParticipantsVideos, setOthersParticipantsVideos] = useState(conversation.participants.filter(participant => participant.userId !== id).map(participant => ({remoteVideo: null, id: participant.userId, username: participant.user.username})))
     // console.log('id:', id)
     // console.log('conversationId:', conversationId)
     // const peer = useMemo(() =>
@@ -39,6 +38,7 @@ export default function Call() {
     // console.log('typeOf RemotesVideos out:', typeof remotesVideos)
 
 
+
     useEffect(() => {
         const listenResponse = (response, callerId) => {
             console.log('(response, callerId):', (response, callerId))
@@ -50,11 +50,16 @@ export default function Call() {
         }
     }, [])
     
+    
     useEffect(() => {
+        if(!isCalling) {
+            navigate(window.location.pathname.replace(/\/video.*/, ""))
+            return
+        }
         // console.log('peer-id first useEffect:', peer.id)
         // const peer2 = peer
         // console.log("window.URLPattern:", window.location.pathname.replace(/\/video.*/, ""));
-        console.log("PeerRef in first useEffevt:", peerRef.current?.id);
+        console.log("PeerRef in first useEffevt:", peerRef.current?.id)
 
         const constraints = {
             audio: true,
@@ -227,10 +232,10 @@ export default function Call() {
         };
     }, [callerId, conversationId, id]);
 
-    if (!isCalling) {
-        navigate(window.location.pathname.replace(/\/video.*/, ""));
-        return;
-    }
+    // if (!isCalling) {
+    //     navigate(window.location.pathname.replace(/\/video.*/, ""));
+    //     return;
+    // }
 
     return (
         <>
@@ -241,14 +246,14 @@ export default function Call() {
             {streamState && (
                 <Video
                     key={streamState.id}
-                    videoStream={{ remoteVideo: streamState, id }}
+                    videoStream={{ remoteVideo: streamState, id, username }}
                     callStatus={callStatus}
                     setCallStatus={setCallStatus}
                     peerConnection={peer}
                 />
             )}
             {/* </div> */}
-            <div className="remotesVideosBox">
+            {/* <div className="remotesVideosBox">
                 {remotesVideos.map((remoteVideo) => {
                     console.log(" typeof remoteVideo:", remoteVideo);
                     // console.log('videoStream instanceof MediaStream:',remoteVideo instanceof MediaStream)
@@ -256,14 +261,15 @@ export default function Call() {
                         <Video key={remoteVideo.id} videoStream={remoteVideo}/>
                     );
                 })}
-            </div>
-            <div className="remotesVideosBox222222">
+            </div> */}
+            <div className="remotesVideosBox">
                 {othersParticipantsVideos.map((participant) => {
                     console.log(" typeof remoteVideo:", participant);
                     // console.log('videoStream instanceof MediaStream:',remoteVideo instanceof MediaStream)
-                    return participant.remoteVideo ? (
+                    console.log('participant.remoteVideo?.active === true:', participant.remoteVideo?.active === true)
+                    return participant.remoteVideo?.active === true ? (
                         <Video key={participant.id} videoStream={participant}/>
-                    ) : (<h3>{participant.id}</h3>)
+                    ) : (<FallbackVideo username={participant.username}/>)
                 })}
             </div>
         </>

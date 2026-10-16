@@ -55,7 +55,8 @@ function SignupPage() {
             then(res => res.json()).
             then(res => {
                 if(res.msg) return setBackendMsgError(res.msg)
-                navigate('/login?issignup=true')
+                console.log('res:', res)
+                // navigate('/login?issignup=true')
             })
     }
 

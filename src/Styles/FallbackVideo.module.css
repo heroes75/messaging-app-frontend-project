@@ -1,0 +1,30 @@
+.username {
+    padding: 2rem;
+    border-radius: 50%;
+    background-color: rgb(165, 42, 42, .6);
+    text-align: center;
+    margin: 0 auto;
+    align-self: center;
+    justify-self: center;
+    font-size: 2rem;
+}
+
+.box {
+    align-self: center;
+    justify-self: center;
+    min-width: 300px;
+    min-height: 300px;
+    border: 3px ridge violet;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* gap: 100px; */
+}
+
+
+.status {
+    justify-self: end;
+    /* align-self: end; */
+    margin-top: 100px;
+    /* padding-top: -100px; */
+}

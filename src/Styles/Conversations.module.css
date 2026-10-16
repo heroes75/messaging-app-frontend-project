@@ -1,0 +1,267 @@
+.conversationsContainer {
+    display: grid;
+    grid-template-columns: 300px auto;
+    min-height: 100%;
+    background-color: var(--bg-third);
+    /* position: relative; */
+}
+
+.conversationsList {
+    /* display: flex;
+    flex-direction: column; */
+    border-right: 4px ridge var(--bg-one);
+    position: sticky;
+    top: 0;
+    /* height: 100vh; */
+    height: calc(100vh - 81px);
+    /* z-index: 1; */
+    align-self: start;
+    width: 100%;
+    /* justify-self: start; */
+    /* overflow-y: scroll; */
+}
+
+.conversationsHead {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    color: var(--color-one);
+    align-items: center;
+    border-bottom: 3px solid var(--color-two);
+}
+
+.button {
+    align-self: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.groupIcon {
+    fill: var(--color-one) !important;
+    width: 2rem;
+    height: 2rem;
+}
+
+.groupIcon:active {
+    fill: blue !important;
+}
+
+.span {
+    font-size: 2rem;
+}
+
+.conversations {
+    list-style: none;
+    overflow-y: scroll;
+    height: calc(100% - 72px);
+    width: 100%;
+    /* padding-left: 15px; */
+}
+
+.li {
+    padding: 35px 10px 35px 15px;
+    font-size: 1.3rem;
+    color: var(--text-third);
+    border-bottom: 3px ridge var(--color-two);
+    display: flex;
+    justify-content: space-between;
+}
+
+.li * {
+    text-decoration: none;
+}
+
+.link {
+    display: inline-flex;
+    justify-content: start;
+    align-items: center;
+    align-self: start;
+}
+
+.img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.manageGroup, .deleteGroup {
+    fill: var(--color-two);
+    width: 30px;
+    height: 30px;
+}
+
+.buttonManageGroup, .deleteButton {
+    background-color: transparent;
+    border: none;
+}
+
+.buttonManageGroup:hover, .deleteGroup:hover {
+    cursor: pointer;
+    fill: var(--color-two);
+}
+
+.manageGroup:hover {
+    fill:  var(--bg-one);
+}
+
+.buttonContainer {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: 50px;
+}
+
+.deleteButton {
+    align-self: self-end;
+
+}
+
+.dialogCreateGroup {
+    position: fixed;
+    left: calc(50vw - 150px);
+    top: calc(50vh - 200px);
+    z-index: 3;
+    padding: 20px;
+    background-color: var(--bg-third);
+    transition: transform .3s ease-in-out, opacity .3s ease-in-out;
+    opacity: 0;
+    transform: scale(0.1);
+}
+
+.dialogCreateGroup.displayDialog {
+    opacity: 1;
+    transform: scale(1);
+    /* transition: transform .3s ease-in-out, opacity .3s ease-in-out; */
+}
+
+.createGroupTitle {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.createGroupErrors {
+    list-style: none;
+    text-align: center;
+}
+
+.createGroupErrors * {
+    color: var(--bg-one);
+}
+
+.inputCreateGroupContainer {
+    margin: 10px 0 10px 0;
+
+}
+
+.inputCreateGroupContainer label {
+    font-family: cursive;
+    font-size: 1.2rem;
+    margin-right: 5px;
+}
+
+.inputCreateGroupContainer input {
+    font-size: 1.2rem;
+    border-radius: 5px;
+}
+
+.friendList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.friendTitle {
+    margin-left: 15px;
+}
+
+.friend {
+    margin-left: 30px;
+    max-width: 50%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.removeInFriendButton, .addFriendToGroupButton {
+    composes: buttonManageGroup;
+}
+
+.removeFriend {
+    fill: var(--bg-one);
+    width: 30px;
+    height: 30px;
+}
+
+.addFriendIcon {
+    composes: removeFriend;
+    fill: green;
+}
+
+.createGroupButtonContainer {
+    text-align: center;
+}
+
+.buttonCreateModel {
+    padding: 7px 13px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+}
+
+.cancelButton {
+    composes: buttonCreateModel;
+    background-color: var(--bg-one);
+    margin-right: 25px;
+}
+
+.validGroupButton {
+    composes: buttonCreateModel;
+    background-color: greenyellow;
+}
+
+.dialogueDeleteGroup {
+    position: fixed;
+    left: calc(50vw - 200px);
+    top: calc(50vh - 50px);
+    padding: 15px;
+    opacity: 0;
+    transform: translateY(-100px);
+    transition: all .5s ease;
+}
+
+.displayDeleteGroupDialog {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.paragraphDeleteGroup {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.deleteGroupButtonContainer {
+    text-align: center;
+}
+
+.validDelete {
+    composes: buttonCreateModel;
+    background-color: var(--bg-one);
+}
+
+.cancelDelete {
+    composes: buttonCreateModel;
+    background-color: greenyellow;
+    margin-right: 20px;
+}
+
+@media (max-width: 1000px) {
+    .conversationsContainer {
+        grid-template-columns: 1fr;
+        /* grid-template-rows: 90vh 10vh; */
+    }
+}

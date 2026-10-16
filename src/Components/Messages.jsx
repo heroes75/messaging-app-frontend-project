@@ -62,7 +62,7 @@ export default function Messages() {
             .then((res) => {
                 setConversation(res.conversation);
                 setIsAllowCall(res.isAllowCall)
-                console.log('res.conversation:', res.conversation)
+                console.log('res.conversation in message:', res.conversation)
                 console.log('res.isAllowCall:', res.isAllowCall)
             })
             .catch((err) => {
@@ -79,7 +79,7 @@ export default function Messages() {
     
         
         socket.on(`message`, (message) => {
-            // console.log('message:', message)
+            console.log('message in msg:', message)
             if(message.conversationId === conversation.id) setConversation({...conversation, messages: conversation.messages.concat(message)})
             
         })
@@ -164,7 +164,7 @@ export default function Messages() {
             setFiles(null)
             setMessage('')
             // console.log('res.notifications:', res.notifications)
-            // socket.emit('message', res.message, res.notifications)
+            socket.emit('message', res.message, res.notifications)
             setConversation({...conversation, messages: [...conversation.messages, res.message]})
         })
         .catch(err => console.error(err))
@@ -219,7 +219,7 @@ export default function Messages() {
     if(isError) return <h1>{isError.message}</h1>
 
     return (
-        <>
+        <div className={styles.messageContainer}>
             <div hidden={isCalling}>
                 {isAllowCall && <div className="callSection">
                     <div>
@@ -289,9 +289,9 @@ export default function Messages() {
                 </form>
             </div>
             <div hidden={!isCalling}>
-                <Outlet context={{id: user.id, socket, conversationId, isCalling, callerId, conversation}}/>
+                <Outlet context={{id: user.id, username: user.username, socket, conversationId, isCalling, callerId, conversation}}/>
             </div>
-        </>
+        </div>
     );
 
     

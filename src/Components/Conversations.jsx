@@ -2,14 +2,19 @@ import Peer from "peerjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useOutletContext } from "react-router";
 import createPeer from "../peerjsUtils/createPeer";
+import styles from '../Styles/Conversations.module.css';
+import GroupAdd from '../assets/group_add.svg?react'
+import ManageGroup from '../assets/manage_accounts.svg?react'
+import DeleteGroup from '../assets/group_remove_24dp_0D0D05_FILL0_wght400_GRAD0_opsz24.svg?react'
 
 const token = `Bearer ${localStorage.getItem('token')}`;
 
 
 export default function Conversations() {
-    const user = useOutletContext()
+    const {user} = useOutletContext()
     const [conversations, setConversation] = useState([]) 
     const [selectedConversation, setSelectedConversation] = useState({}) 
+    const [clickedConversation, setClickedConversation] = useState({}) 
     const [participantsId, setParticipantsId] = useState([])
     const [name, setName] = useState('')
     const [isOpenToUpdate, setIsOpenToUpdate] = useState(false)
@@ -22,13 +27,13 @@ export default function Conversations() {
     //     port: 3001,
     //     secure: false,
     // }))
-    const [availableCall, setAvailableCall] = useState([])
-    // const participants = conversations?.participants?.filter(participant => participant?.user?.id === user.id)
-    // console.log('participants in conversations:', participants)
-    const dialog = useRef()
-    const dialogDeleteGroup = useRef()
+    const [isOpenGroupOption, setIsOpenGroupOption] = useState(false)
+    const [isOpenDeleteGroupDialog, setIsOpenDeleteGroupDialog] = useState(false)
+    const dialog = useRef(null)
+    const dialogDeleteGroup = useRef(null)
     const isInsufficientParticipant = participantsId.length < 2
-    const isNameEmpty = name === ""
+    const isNameEmpty = name === "";
+    // const isScreenInferior1000px = window.matchMedia()
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
@@ -39,20 +44,15 @@ export default function Conversations() {
         })
             .then(res => res.json())
             .then(res => {
-                console.log('res.conversations:', res.conversations)
+                // console.log('res.conversations:', res.conversations)
+                setClickedConversation({})
                 setConversation(res.conversations)
             })
             .finally(() => setIsLoading(false))
+        return () => {
+            setClickedConversation({})
+        }
     }, [])
-
-    // useEffect(() => {
-    //     console.log('peer in conversation:', peer.id)
-    //     // peer.connect()
-
-    //     return () => {
-    //         peer.disconnect()
-    //     }
-    // }, [peer])
 
     function addFriend(obj) {
         setParticipantsId(participantsId.concat(obj))
@@ -65,6 +65,8 @@ export default function Conversations() {
     }
 
     function cancel() {
+        setIsOpenGroupOption(false)
+        console.log('isOpenGroupOption:', isOpenGroupOption)
         setFriends(user.friendFirst.concat(user.friendSecond));
         setParticipantsId([]);
         setName("");
@@ -75,12 +77,22 @@ export default function Conversations() {
     function openDialog(conversation) {
         const participants = conversation.participants.filter(participant => participant.userId !== user.id).map(participant => participant.user)
         setParticipantsId(participants)
+        console.log('participants:', participants)
         setName(conversation.name)
-        console.log('{id: conversation.id, name: conversation.name}:', {id: conversation.id, name: conversation.name})
+        // console.log('{id: conversation.id, name: conversation.name}:', {id: conversation.id, name: conversation.name})
         setSelectedConversation({id: conversation.id, name: conversation.name})
         setIsOpenToUpdate(true)
         setFriends(friends.filter(friend => !participants.some(participant => participant.id === friend.id )))
-        dialog.current.show()
+        dialog.current.showModal()
+        setIsOpenGroupOption(true)
+        console.log('isOpenGroupOption: in open', isOpenGroupOption)
+    }
+
+    function openDialogToCreateGroup() {
+        setIsOpenGroupOption(true)
+        console.log('isOpenGroupOption: in open', isOpenGroupOption)
+        dialog.current.showModal();
+        setIsOpenToUpdate(false);
     }
 
     function createGroup() {
@@ -89,9 +101,9 @@ export default function Conversations() {
             method: 'POST',
             headers: {
                 authorization: token,
-                'content-type': 'application/json'
+                'content-type': 'application/json',
             },
-            body: JSON.stringify({participantsId: participantsId.map(participant => participant.id), name})
+            body: JSON.stringify({participantsId: participantsId.map(participant => participant.id), name}),
         })
         .then(res => res.json())
         .then(res => {
@@ -128,11 +140,13 @@ export default function Conversations() {
 
     function openDialogDelete(conversation) {
         setSelectedConversation(conversation)
-        dialogDeleteGroup.current.show()
+        setIsOpenDeleteGroupDialog(true)
+        dialogDeleteGroup.current.showModal()
     }
 
     function cancelDelete() {
         dialogDeleteGroup.current.close()
+        setIsOpenDeleteGroupDialog(false)
     }
 
     function deleteGroup(conversationId) {
@@ -148,6 +162,7 @@ export default function Conversations() {
         .then(res => {
             console.log('res.conversation:', res.conversation)
             dialogDeleteGroup.current.close()
+            setIsOpenDeleteGroupDialog(false)
         })
         .catch(err => console.error(err))
     }
@@ -169,6 +184,10 @@ export default function Conversations() {
         }
     }
 
+    function displayClickedConversation(conversation) {
+        setClickedConversation(conversation)
+    }
+
     // const videoCall = () => {
     //     navigator.mediaDevices.getUserMedia({
     //         audio: true,
@@ -182,84 +201,135 @@ export default function Conversations() {
     if(isLoading) return <h1>Loading spinner</h1>
 
     return (
-        <>
-            <dialog ref={dialogDeleteGroup}>
-                are you sure you want delete this group "{selectedConversation.name}"
-                <button onClick={() => deleteGroup(selectedConversation.id)}>Ok</button>
-                <button onClick={cancelDelete}>Cancel</button>
+        <div className={styles.conversationsContainer}>
+            <dialog ref={dialogDeleteGroup} className={`${styles.dialogueDeleteGroup} ${isOpenDeleteGroupDialog ? styles.displayDeleteGroupDialog : ''}`}>
+                <p className={styles.paragraphDeleteGroup}>
+                    are you sure you want delete this group
+                    "{selectedConversation.name}":
+                </p>
+                <div className={styles.deleteGroupButtonContainer}>
+                    <button className={styles.cancelDelete} onClick={cancelDelete}>Cancel</button>
+                    <button className={styles.validDelete} onClick={() => deleteGroup(selectedConversation.id)}>
+                        Ok
+                    </button>
+                </div>
             </dialog>
-            <dialog ref={dialog}>
-                <ul>
-                    {
-                        msgError.map(msg => <li>{msg}</li>)
-                    }
+            <dialog ref={dialog} id="createGroupId" className={`${styles.dialogCreateGroup} ${isOpenGroupOption ? styles.displayDialog : ''}`}>
+                <h3 className={styles.createGroupTitle}>{!isOpenToUpdate ? 'Create New Group:': 'Update Group:'}</h3>
+                <ul className={styles.createGroupErrors}>
+                    {msgError.map((msg) => (
+                        <li>{msg}</li>
+                    ))}
                 </ul>
-                <label htmlFor="name">Group Name:</label>
-                <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    type="text"
-                    name="name"
-                    id="name"
-                />
-                <ul>
-                    <li>Added Friend</li>
+                <div className={styles.inputCreateGroupContainer}>
+                    <label htmlFor="name">Group Name:</label>
+                    <input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        type="text"
+                        name="name"
+                        id="name"
+                    />
+                </div>
+                <ul className={styles.friendList}>
+                    <li className={styles.friendTitle}><h3>Added Friend</h3></li>
                     {participantsId.map((participantId) => (
-                        <li>
+                        <li className={styles.friend} key={participantId.id}>
                             {participantId.username}{" "}
-                            <button onClick={() => removeFriend(participantId)}>
-                                remove
+                            <button className={styles.removeInFriendButton} onClick={() => removeFriend(participantId)}>
+                                <DeleteGroup className={styles.removeFriend}/>
                             </button>
                         </li>
                     ))}
                 </ul>
-                <ul>
-                    <li>friends</li>
+                <ul className={styles.friendList}>
+                    <li className={styles.friendTitle}><h3>friends</h3></li>
                     {friends.map((friend) => (
-                        <li key={friend.userId}>
+                        <li className={styles.friend} key={friend.id}>
                             {friend.username}{" "}
-                            <button onClick={() => addFriend(friend)}>
-                                add
+                            <button className={styles.addFriendToGroupButton} onClick={() => addFriend(friend)}>
+                                <GroupAdd className={styles.addFriendIcon}/>
                             </button>
                         </li>
                     ))}
                 </ul>
-                <button onClick={cancel}>cancel</button>
-                {
-                    isOpenToUpdate ? <button onClick={() => updateGroup(selectedConversation.id)}>Save</button> : <button onClick={createGroup}>Create Group</button>
-                }
-                
+                <div className={styles.createGroupButtonContainer}>
+                    <button command='createGroupId' commandfor='close' className={`${styles.cancelButton}`} onClick={cancel}>cancel</button>
+                    {isOpenToUpdate ? (
+                        <button
+                            onClick={() => updateGroup(selectedConversation.id)}
+                            className={styles.validGroupButton}
+                        >
+                            Save
+                        </button>
+                    ) : (
+                        <button className={styles.validGroupButton} onClick={createGroup}>Create Group</button>
+                    )}
+                </div>
             </dialog>
-    
-            <button onClick={() => {dialog.current.show(); setIsOpenToUpdate(false); console.log('friends:', friends)}}>Add Group</button>
-            
-            <ul>
-                {conversations.map((conversation) => {
-                    const participants = conversation.participants.filter(participant => participant.user.id !== user.id)
-                    return(<li key={conversation.id}>
-                        <Link to={`/conversation/${conversation.id}`} state={{ participants: participants }} >
-                            {conversation.isGroup
-                                ? conversation.name
-                                : conversation.participants.filter(
-                                      (participant) =>
-                                          participant.userId !== user.id,
-                                  )[0].user.username}
-                        </Link>{" "}
-                        {conversation.participants.find(
-                            (participant) =>
-                                participant.userId === user.id &&
-                                participant.role === "ADMIN",
-                        ) && (
-                            <span>
-                                <button onClick={() => openDialog(conversation)}>Edit</button> <button onClick={() => openDialogDelete(conversation)}>Delete</button>
-                            </span>
-                        )}{" "}
-                    </li>
-                )})}
-            </ul>
-            <div>
-                <Outlet context={{user}} />
+            <div className={styles.conversationsList}style={{display: clickedConversation.id ? 'none' : 'block'}}>
+                <div className={styles.conversationsHead}>
+                    <span className={styles.span}>Conversations</span>
+                    <button
+                        className={styles.button}
+                        onClick={openDialogToCreateGroup}
+                    >
+                        <GroupAdd className={styles.groupIcon} />
+                    </button>
+                </div>
+                <ul className={styles.conversations} >
+                    {conversations.map((conversation) => {
+                        // console.log('conversation:', conversation)
+                        const participants = conversation.participants.filter(
+                            (participant) => participant.user.id !== user.id,
+                        );
+                        return (
+                            <li className={styles.li} key={conversation.id}>
+                                <Link
+                                    to={`/conversation/${conversation.id}`}
+                                    state={{ participants: participants }}
+                                    className={styles.link}
+                                    onClick={() => displayClickedConversation(conversation)}
+                                >
+                                    
+                                    {conversation.isGroup
+                                        ? conversation.name
+                                        : (<> <img className={styles.img} src={participants[0].user.profile.imageUrl} alt="photo profile of user" /> {participants[0].user.username}</>)}
+                                </Link>{" "}
+                                {conversation.participants.find(
+                                    (participant) =>
+                                        participant.userId === user.id &&
+                                        participant.role === "ADMIN",
+                                ) && (
+                                    <span>
+                                        <div className={styles.buttonContainer}>
+                                            <button
+                                                onClick={() =>
+                                                    openDialog(conversation)
+                                                }
+                                                className={styles.buttonManageGroup}
+                                            >
+                                                <ManageGroup className={styles.manageGroup} />
+                                            </button>{" "}
+                                            <button
+                                                onClick={() =>
+                                                    openDialogDelete(conversation)
+                                                }
+                                                className={styles.deleteButton}
+                                            >
+                                                <DeleteGroup className={styles.deleteGroup}/>
+                                            </button>
+                                        </div>
+                                    </span>
+                                )}{" "}
+                            </li>
+                        );
+                    })}
+                </ul>
             </div>
-        </>
+            <div className={styles.MessagesContainer}>
+                <Outlet context={{ user }} />
+            </div>
+        </div>
     );
 }

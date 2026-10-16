@@ -77,7 +77,7 @@ export default function SearchComponent() {
     }
 
     return (
-        <>
+        <div>
             {msgError.map((error) => error.msg)}
             <label htmlFor="user">Search your friend: </label>
             <input
@@ -113,6 +113,6 @@ export default function SearchComponent() {
                     </li>
                 ))}
             </ul>
-        </>
+        </div>
     );
 }

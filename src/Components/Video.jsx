@@ -8,7 +8,7 @@ export default function Video({videoStream, callStatus, setCallStatus, peerConne
         // console.log('videoStream:',videoStream)
         // console.log('videoStream instanceof MediaStream:',videoStream.remoteVideo instanceof MediaStream)
         ref.current.srcObject = videoStream.remoteVideo
-        console.log('videoStream.remoteVideo:', videoStream.remoteVideo)
+        console.log('videoStream in video:', videoStream)
         // ref.current.addEventListener('loadedmetadata', () => {
         //     ref.current.play()
         // })
@@ -21,7 +21,7 @@ export default function Video({videoStream, callStatus, setCallStatus, peerConne
     return (
         <div className={styles.videoContainer}>
             <video className={styles.video} width={300} ref={ref} autoPlay></video>
-            <p className={styles.username}>{videoStream.id}</p>
+            <p className={styles.username}>{videoStream.username}</p>
             { callStatus && 
             (<div className={styles.buttonContainers}>
                 <ActionButtons disableVideo={disableVideo} localVideo={ref} callStatus={callStatus} setCallStatus={setCallStatus} videoStream={videoStream.remoteVideo} peerConnection={peerConnection} />

@@ -1,0 +1,125 @@
+.nav {
+    display: flex;
+    padding: 30px 25px;
+    justify-content: space-between;
+    background-color: var(--bg-third);
+    /* position: sticky; */
+    /* height: 80px; */
+    /* top: 0; */
+    /* z-index: 1; */
+}
+
+main {
+    flex-grow: 2;
+    display: grid;
+    grid-template-columns: 100px auto;
+    position: relative;
+    align-items: start;
+
+}
+
+.aside {
+    background-color: var(--bg-two);
+    color: var(--text-one);
+    position: sticky;
+    /* height: 100vh; */
+    height: calc(100vh - 81px);
+    top: 0;
+}
+
+.ul {
+    padding-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    list-style: none;
+    text-decoration: none;
+}
+
+.ul * {
+    list-style: none;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ul span {
+    font-weight: 750;
+}
+
+.ul li:last-of-type {
+    position: relative;
+}
+
+.ChatIcon, .FriendsIcon, .ProfileIcon, .NotificationIcon {
+    height: 50px;
+    width: 50px;
+    margin: 0 auto;
+    /* fill: yellow; */
+}
+
+.notificationCounter {
+    text-align: center;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    /* padding: 5px; */
+    border-radius: 50%;
+    background-color: red;
+    left: 65%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notificationCounter * {
+    justify-content: center;
+}
+
+.notification {
+    position: absolute;
+    background-color: var(--bg-one);
+    padding: 20px 30px;
+    border: 2px solid var(--text-one);
+    top: 30px;
+    right: 20px;
+    text-align: center;
+    /* transform: translateY(-30px); */
+    opacity: 0;
+    transition: transform 3s 2s, opacity 3s 2s;
+
+}
+
+.buttonContainer {
+    margin-top: 1rem;
+    text-align: center;
+    color: var(--text-two);
+}
+
+.buttonContainer * {
+    text-align: center;
+    padding: 10px 15px;
+    color: var(--text-two);
+    border-radius: 10px;
+}
+
+.notification span {
+    font-size: 1.2rem;
+}
+
+.notification.move {
+    /* transition: all 3s; */
+    transform: translateY(100px);
+    opacity: 1;
+}
+
+.buttonContainer button:first-of-type {
+    margin-right: 25px;
+    color: var(--text-two);
+}
+.buttonContainer button:last-of-type {
+    margin-left: 25px;
+    color: var(--text-two);
+}
+
