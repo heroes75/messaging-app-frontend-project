@@ -1,7 +1,7 @@
-import Peer from "peerjs";
+// import Peer from "peerjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useOutletContext } from "react-router";
-import createPeer from "../peerjsUtils/createPeer";
+// import createPeer from "../peerjsUtils/createPeer";
 import styles from '../Styles/Conversations.module.css';
 import GroupAdd from '../assets/group_add.svg?react'
 import ManageGroup from '../assets/manage_accounts.svg?react'
@@ -14,6 +14,7 @@ export default function Conversations() {
     const {user} = useOutletContext()
     const [conversations, setConversation] = useState([]) 
     const [selectedConversation, setSelectedConversation] = useState({}) 
+    const [isMessageOpen, setIsMessageOpen] = useState(false) 
     const [clickedConversation, setClickedConversation] = useState({}) 
     const [participantsId, setParticipantsId] = useState([])
     const [name, setName] = useState('')
@@ -28,12 +29,17 @@ export default function Conversations() {
     //     secure: false,
     // }))
     const [isOpenGroupOption, setIsOpenGroupOption] = useState(false)
-    const [isOpenDeleteGroupDialog, setIsOpenDeleteGroupDialog] = useState(false)
+    const [isScreenInferior1000px, setIsScreenInferior1000px] = useState(window.matchMedia('(max-width: 850px)'));
+    console.log('window.matchMedia(max-width: 850px).matches:', window.matchMedia('(max-width: 850px)').matches)
+    const testUrl = window.location.href.replace(/http.*\/conversation/, '') !== ''
+    console.log('testUrl:', testUrl)
+    const [isHideConversationList, setIsHideConversationList] = useState(isScreenInferior1000px.matches && testUrl) 
+    console.log('isScreenInferior1000px.matches && isMessageOpen:', isScreenInferior1000px.matches && isMessageOpen)
+    console.log('isHideConversationList:', isHideConversationList)
     const dialog = useRef(null)
     const dialogDeleteGroup = useRef(null)
     const isInsufficientParticipant = participantsId.length < 2
     const isNameEmpty = name === "";
-    // const isScreenInferior1000px = window.matchMedia()
 
     useEffect(() => {
         fetch(`${import.meta.env.VITE_API_URL}/conversation`, {
@@ -44,13 +50,27 @@ export default function Conversations() {
         })
             .then(res => res.json())
             .then(res => {
-                // console.log('res.conversations:', res.conversations)
+                console.log('res.conversations:', res.conversations)
                 setClickedConversation({})
                 setConversation(res.conversations)
             })
             .finally(() => setIsLoading(false))
         return () => {
             setClickedConversation({})
+        }
+    }, [])
+
+    useEffect(() => {
+        const checkWidth = (e) => {
+            setIsHideConversationList(e.matches && testUrl)
+            setIsScreenInferior1000px(e.matches)
+            console.log('testUrl in checkWidth:', testUrl)
+            console.log('e.matches:', e.matches)
+        }
+        isScreenInferior1000px.addEventListener('change',checkWidth)
+
+        return () => {
+            isScreenInferior1000px.removeEventListener('change', checkWidth)
         }
     }, [])
 
@@ -140,13 +160,11 @@ export default function Conversations() {
 
     function openDialogDelete(conversation) {
         setSelectedConversation(conversation)
-        setIsOpenDeleteGroupDialog(true)
         dialogDeleteGroup.current.showModal()
     }
 
     function cancelDelete() {
         dialogDeleteGroup.current.close()
-        setIsOpenDeleteGroupDialog(false)
     }
 
     function deleteGroup(conversationId) {
@@ -162,7 +180,6 @@ export default function Conversations() {
         .then(res => {
             console.log('res.conversation:', res.conversation)
             dialogDeleteGroup.current.close()
-            setIsOpenDeleteGroupDialog(false)
         })
         .catch(err => console.error(err))
     }
@@ -186,6 +203,9 @@ export default function Conversations() {
 
     function displayClickedConversation(conversation) {
         setClickedConversation(conversation)
+        // setIsHideConversationList(isScreenInferior1000px && true)
+        // console.log('(window.location.href + conversation.id).replace(/http.*/conversation/, ):', (window.location.href).replace(/http.*\/conversation/, ''))
+        // setTestUrl((window.location.href + '/' + conversation.id).replace(/http.*\/conversation/, '') !== '')
     }
 
     // const videoCall = () => {
@@ -202,7 +222,7 @@ export default function Conversations() {
 
     return (
         <div className={styles.conversationsContainer}>
-            <dialog ref={dialogDeleteGroup} className={`${styles.dialogueDeleteGroup} ${isOpenDeleteGroupDialog ? styles.displayDeleteGroupDialog : ''}`}>
+            <dialog ref={dialogDeleteGroup} className={styles.dialogueDeleteGroup}>
                 <p className={styles.paragraphDeleteGroup}>
                     are you sure you want delete this group
                     "{selectedConversation.name}":
@@ -267,7 +287,7 @@ export default function Conversations() {
                     )}
                 </div>
             </dialog>
-            <div className={styles.conversationsList}style={{display: clickedConversation.id ? 'none' : 'block'}}>
+            <div className={styles.conversationsList} style={{display: (isMessageOpen && isScreenInferior1000px) ? 'none' : 'block'}} qwerty={isHideConversationList.toString()}>
                 <div className={styles.conversationsHead}>
                     <span className={styles.span}>Conversations</span>
                     <button
@@ -328,7 +348,7 @@ export default function Conversations() {
                 </ul>
             </div>
             <div className={styles.MessagesContainer}>
-                <Outlet context={{ user }} />
+                <Outlet context={{ user, setClickedConversation, setIsMessageOpen }} />
             </div>
         </div>
     );

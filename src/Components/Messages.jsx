@@ -23,15 +23,9 @@ export default function Messages() {
     const [isCalling, setIsCalling] = useState(false)
     const [hash, setHash] = useState('')
     const inputFiles = useRef()
-    const {user} = useOutletContext()
-    // console.log('peer in msg:', peer.id)
-    // console.log('useOutletContext():', useOutletContext())
-    // console.log('user msg:', user)
+    const {user, setClickedConversation, setIsMessageOpen} = useOutletContext()
     // const peer = useOutletContext().peer
     const location = useLocation()
-    // console.log('participants: msg', participants)
-    // console.log('peer:', peer)
-    // console.log('location.state.participants:', location)
     const {conversationId} = useParams()
     const navigate = useNavigate()
     const fileTypes = [
@@ -49,6 +43,7 @@ export default function Messages() {
 
 
     useEffect(() => {
+        setIsMessageOpen(true)
         fetch(
             `${import.meta.env.VITE_API_URL}/conversation/${conversationId}`,
             {
@@ -70,6 +65,9 @@ export default function Messages() {
                 setIsError(err);
             })
             .finally(() => setIsLoading(false));
+        return () => {
+            setIsMessageOpen(false)
+        }
     }, [conversationId])
 
     useEffect(() => {
