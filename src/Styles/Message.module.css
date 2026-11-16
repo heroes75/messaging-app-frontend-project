@@ -1,11 +1,140 @@
-.textarea {
-    resize: none;
+.messageContainer {
+    height: calc(100vh - 71.6px);
+    padding-bottom: 1em;
+    overflow-y: auto;
 }
 
-.ul {
-    min-width: 400px;
+.subMessageContainer {
+    min-height: stretch;
+    /* overflow-y: scroll; */
     display: flex;
     flex-direction: column;
+}
+.messageHead {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--bg-one);
+    box-shadow: 0 5px 5px 2px black;
+    position: sticky;
+    top: 0;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+}
+
+.messageBody {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content:  end;
+}
+
+.messageHead * {
+    color: var(--text-one);
+}
+
+.backLink {
+    align-self: center;
+    margin-left: -20px;
+}
+
+.messageInfo {
+    display: flex;
+    gap: 5px;
+}
+
+.participantImg {
+    width: 60px;
+    border-radius: 70%;
+}
+.participantName {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.participantUsername {
+    font-size: 1.3rem;
+}
+
+.realName {
+    opacity: .7;
+    font-style: italic;
+}
+
+.callSection {
+    align-self: center;
+}
+
+.videoCallButton {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.videoCallIcon {
+    opacity: .6;
+    transition: transform .7s ease, 
+                fill .7s ease,
+                opacity .7s ease;
+}
+
+.videoCallIcon:hover {
+    transform: scale(1.1);
+    fill: var(---text-third);
+    opacity: 1;
+}
+
+
+.messagesList {
+    /* min-width: 400px; */
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    justify-content: end;
+    gap: 1rem;
+    /* align-self: end; */
+    /* height: calc(100% - 100px); */
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px 7px;
+    background-color: var(--bg-two);
+    border-radius: 10px;
+    /* text-wrap: wrap; */
+    /* overflow:visible; */
+}
+
+.message p{
+    padding: 0 5px;
+    /* white-space: wrap; */
+    width: 100%;
+    /* text-overflow: '...'; */
+    /* text-wrap: wrap; */
+    overflow-wrap: anywhere;
+    /* overflow: hidden; */
+}
+
+.message h4 {
+    color: var(--color-two);
+}
+
+.message div {
+    width: 100%;
+    text-align: end;
+    font-size: .7rem;
+}
+
+.form {
+    /* align-self: end; */
+}
+
+.textarea {
+    resize: none;
+    min-height: 60px;
+    max-height: 300px;
+    width: 200px;
+    field-sizing: content;
 }
 
 .right {
@@ -16,4 +145,25 @@
 .left {
     align-self: start;
     margin: 0 0 0  10px;
+}
+
+.center {
+    align-self: center;
+    padding: 10px;
+    background-color: var(--date-in-message-bg);
+    color: var(--text-one);
+    border-radius: 7px;
+
+}
+
+.img {
+    width: 100%;
+        height: auto;
+}
+
+@media (max-width: 850px) {
+    .messageContainer {
+        height: calc(100vh - 71.6px - 80px);
+    }
+
 }

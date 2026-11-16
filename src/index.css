@@ -6,6 +6,8 @@
   --text-third: #402110;
   --color-one: #D98977;
   --color-two: #A6341B;
+  --date-in-message-bg: rgba(192, 132, 252, 0.15);
+  --date-in-message-text: #9ca3af;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,6 +30,7 @@
 * {
   margin: 0;
   padding: 0;
+  border: none;
   box-sizing: border-box;
 }
 

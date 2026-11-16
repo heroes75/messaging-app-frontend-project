@@ -1,7 +1,7 @@
 .conversationsContainer {
     display: grid;
     grid-template-columns: 300px auto;
-    min-height: 100%;
+    /* height: 100%; */
     background-color: var(--bg-third);
     /* position: relative; */
 }
@@ -12,8 +12,8 @@
     border-right: 4px ridge var(--bg-one);
     position: sticky;
     top: 0;
-    /* height: 100vh; */
-    height: calc(100vh - 81px);
+    height: calc(100vh - 71.6px);
+    /* height: 100%; */
     /* z-index: 1; */
     align-self: start;
     width: 100%;
@@ -53,7 +53,7 @@
 
 .conversations {
     list-style: none;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: calc(100% - 72px);
     width: 100%;
     /* padding-left: 15px; */
@@ -268,9 +268,17 @@
     margin-right: 20px;
 }
 
+.messagesContainer {
+    /* max-height: 100%; */
+}
+
 @media (max-width: 850px) {
     .conversationsContainer {
         grid-template-columns: 1fr;
         /* grid-template-rows: 90vh 10vh; */
+    }
+
+    .conversationsList {
+        height: calc(100vh - 71.6px - 80px);
     }
 }

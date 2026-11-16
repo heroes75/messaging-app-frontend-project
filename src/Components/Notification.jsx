@@ -47,7 +47,7 @@ export default function Notifications() {
 
     return (
         <>
-            <ul>
+            <ul style={{backgroundColor: 'blue'}}>
                 {
                     notifications.map(notification => <li key={notification.id}><span>{notification.notification}</span> <span>{notification.createdAt}</span></li>)
                 }

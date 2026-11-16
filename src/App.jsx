@@ -23,7 +23,7 @@ function App() {
     // const notifRef = useRef(null)
     const unreadNotificationLength = user.notifications?.filter(notif => notif.status === 'NOT_READ').length || 0
     const isHaveNotifs = unreadNotificationLength !== 0
-    console.log('unreadNotificationLength:', unreadNotificationLength === 0)
+    // console.log('unreadNotificationLength:', unreadNotificationLength === 0)
 
 
     useEffect(() => {
@@ -43,8 +43,8 @@ function App() {
             key = setTimeout(() => {
                 console.log('Twice')
                 setNotifications(prevNotif =>  prevNotif.map(notif => {
-                    console.log('notif:', notif)
-                    console.log('prevNotif.length:', prevNotif.length)
+                    // console.log('notif:', notif)
+                    // console.log('prevNotif.length:', prevNotif.length)
                     if (notif.notifications.id === notifications.id) {
                         // const copyNotif = 
                         return {notifications: notif.notifications, isShow: false}
@@ -57,8 +57,8 @@ function App() {
             setTimeout(() => {
                 console.log('Twice 3')
                 setNotifications(prevNotif =>  prevNotif.map(notif => {
-                    console.log('notif: 2', notif)
-                    console.log('prevNotif.length: 2', prevNotif.length)
+                    // console.log('notif: 2', notif)
+                    // console.log('prevNotif.length: 2', prevNotif.length)
                     if (notif.notifications.id === notifications.id) {
                         // const copyNotif = 
                         return {notifications: notif.notifications, isShow: true}
@@ -72,7 +72,7 @@ function App() {
         }
         socket.on('notifications', updateUserNotification)
         return () => {
-            console.log('key in return:', key)
+            // console.log('key in return:', key)
             clearTimeout(key)
             socket.off('notifications', updateUserNotification)
             socket.disconnect()
@@ -162,13 +162,13 @@ function App() {
                 
                 <aside className={styles.aside}>
                     <ul className={styles.ul}>
-                        <li onClick={() => select(`/conversation`)} style={isStyleApplied('/conversation')}> <Link to={`/conversation`}> <ChatIcon className={styles.ChatIcon} /><span>Conversations</span></Link></li>
-                        <li onClick={() => select(`/friendship`)} style={isStyleApplied('/friendship')}><Link to={`/friendship`}> <FriendsIcon className={styles.FriendsIcon} /><span>Friends</span></Link></li>
-                        <li onClick={() => select('/profile')}  style={isStyleApplied('/profile')}><Link to={`/profile/${user.profile.id}`}><ProfileIcon className={styles.ProfileIcon}/><span>Profile</span></Link></li>
-                        <li onClick={() => select('/notification')}  style={isStyleApplied('/notification')}><Link to={`/notification`}>{isHaveNotifs ? <NotificationIconActive className={styles.NotificationIcon} /> : <NotificationIcon className={styles.NotificationIcon} />}<span>Notifications</span></Link> {unreadNotificationLength !== 0 && <div className={styles.notificationCounter} ><span>{unreadNotificationLength}</span></div>}</li>
+                        <li onClick={() => select(`/conversation`)} style={isStyleApplied('/conversation')}> <Link to={`/conversation`}> <ChatIcon className={styles.ChatIcon} /></Link></li>
+                        <li onClick={() => select(`/friendship`)} style={isStyleApplied('/friendship')}><Link to={`/friendship`}> <FriendsIcon className={styles.FriendsIcon} /></Link></li>
+                        <li onClick={() => select('/profile')}  style={isStyleApplied('/profile')}><Link to={`/profile/${user.profile.id}`}><ProfileIcon className={styles.ProfileIcon}/></Link></li>
+                        <li onClick={() => select('/notification')}  style={isStyleApplied('/notification')}><Link to={`/notification`}>{isHaveNotifs ? <NotificationIconActive className={styles.NotificationIcon} /> : <NotificationIcon className={styles.NotificationIcon} />}</Link> {unreadNotificationLength !== 0 && <div className={styles.notificationCounter} ><span>{unreadNotificationLength}</span></div>}</li>
                     </ul>
                 </aside>
-                <div className="details">
+                <div className={styles.content}>
                     <Outlet context={{user, setUser}}/>
                 </div>
             </main>

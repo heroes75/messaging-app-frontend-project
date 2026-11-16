@@ -15,6 +15,7 @@ export default function Conversations() {
     const [conversations, setConversation] = useState([]) 
     const [selectedConversation, setSelectedConversation] = useState({}) 
     const [isMessageOpen, setIsMessageOpen] = useState(false) 
+    console.log('isMessageOpen:', isMessageOpen)
     const [clickedConversation, setClickedConversation] = useState({}) 
     const [participantsId, setParticipantsId] = useState([])
     const [name, setName] = useState('')
@@ -29,7 +30,9 @@ export default function Conversations() {
     //     secure: false,
     // }))
     const [isOpenGroupOption, setIsOpenGroupOption] = useState(false)
-    const [isScreenInferior1000px, setIsScreenInferior1000px] = useState(window.matchMedia('(max-width: 850px)'));
+    const mediaQueryFunction = window.matchMedia('(max-width: 850px)')
+    const [isScreenInferior1000px, setIsScreenInferior1000px] = useState(mediaQueryFunction.matches);
+    console.log('isScreenInferior1000px:', isScreenInferior1000px)
     console.log('window.matchMedia(max-width: 850px).matches:', window.matchMedia('(max-width: 850px)').matches)
     const testUrl = window.location.href.replace(/http.*\/conversation/, '') !== ''
     console.log('testUrl:', testUrl)
@@ -67,10 +70,10 @@ export default function Conversations() {
             console.log('testUrl in checkWidth:', testUrl)
             console.log('e.matches:', e.matches)
         }
-        isScreenInferior1000px.addEventListener('change',checkWidth)
+        mediaQueryFunction.addEventListener('change',checkWidth)
 
         return () => {
-            isScreenInferior1000px.removeEventListener('change', checkWidth)
+            mediaQueryFunction.removeEventListener('change', checkWidth)
         }
     }, [])
 
@@ -86,7 +89,7 @@ export default function Conversations() {
 
     function cancel() {
         setIsOpenGroupOption(false)
-        console.log('isOpenGroupOption:', isOpenGroupOption)
+        // console.log('isOpenGroupOption:', isOpenGroupOption)
         setFriends(user.friendFirst.concat(user.friendSecond));
         setParticipantsId([]);
         setName("");
@@ -97,7 +100,7 @@ export default function Conversations() {
     function openDialog(conversation) {
         const participants = conversation.participants.filter(participant => participant.userId !== user.id).map(participant => participant.user)
         setParticipantsId(participants)
-        console.log('participants:', participants)
+        // console.log('participants:', participants)
         setName(conversation.name)
         // console.log('{id: conversation.id, name: conversation.name}:', {id: conversation.id, name: conversation.name})
         setSelectedConversation({id: conversation.id, name: conversation.name})
@@ -105,12 +108,12 @@ export default function Conversations() {
         setFriends(friends.filter(friend => !participants.some(participant => participant.id === friend.id )))
         dialog.current.showModal()
         setIsOpenGroupOption(true)
-        console.log('isOpenGroupOption: in open', isOpenGroupOption)
+        // console.log('isOpenGroupOption: in open', isOpenGroupOption)
     }
 
     function openDialogToCreateGroup() {
         setIsOpenGroupOption(true)
-        console.log('isOpenGroupOption: in open', isOpenGroupOption)
+        // console.log('isOpenGroupOption: in open', isOpenGroupOption)
         dialog.current.showModal();
         setIsOpenToUpdate(false);
     }
@@ -287,7 +290,7 @@ export default function Conversations() {
                     )}
                 </div>
             </dialog>
-            <div className={styles.conversationsList} style={{display: (isMessageOpen && isScreenInferior1000px) ? 'none' : 'block'}} qwerty={isHideConversationList.toString()}>
+            <div className={styles.conversationsList} style={{display: (isMessageOpen && isScreenInferior1000px) ? 'none' : 'block'}}>
                 <div className={styles.conversationsHead}>
                     <span className={styles.span}>Conversations</span>
                     <button
@@ -303,18 +306,19 @@ export default function Conversations() {
                         const participants = conversation.participants.filter(
                             (participant) => participant.user.id !== user.id,
                         );
+                        const conversationInfo = conversation.isGroup ? {name: conversation.name} : participants[0].user
                         return (
                             <li className={styles.li} key={conversation.id}>
                                 <Link
                                     to={`/conversation/${conversation.id}`}
-                                    state={{ participants: participants }}
+                                    state={{ participants, conversationInfo }}
                                     className={styles.link}
                                     onClick={() => displayClickedConversation(conversation)}
                                 >
                                     
                                     {conversation.isGroup
-                                        ? conversation.name
-                                        : (<> <img className={styles.img} src={participants[0].user.profile.imageUrl} alt="photo profile of user" /> {participants[0].user.username}</>)}
+                                        ? conversationInfo.name
+                                        : (<> <img className={styles.img} src={conversationInfo.profile.imageUrl} alt="photo profile of user" /> {conversationInfo.username}</>)}
                                 </Link>{" "}
                                 {conversation.participants.find(
                                     (participant) =>
@@ -347,8 +351,8 @@ export default function Conversations() {
                     })}
                 </ul>
             </div>
-            <div className={styles.MessagesContainer}>
-                <Outlet context={{ user, setClickedConversation, setIsMessageOpen }} />
+            <div className={styles.messagesContainer}>
+                <Outlet context={{ user, setClickedConversation, setIsMessageOpen, isScreenInferior1000px }} />
             </div>
         </div>
     );
