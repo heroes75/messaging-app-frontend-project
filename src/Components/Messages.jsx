@@ -6,6 +6,7 @@ import socket from "../socket";
 import VideoCallIcon from '../assets/videoCallIcon.svg?react'
 import VideoCallIcon2 from '../assets/videoCallIcon2.svg?react'
 import ArrowBackIcon from '../assets/arrowBackIcon.svg?react'
+import AttachFileIcon from '../assets/attach_file.svg?react'
 import { differenceInCalendarDays, format, formatDistance } from "date-fns";
 
 
@@ -281,37 +282,42 @@ export default function Messages() {
                         ))}
                     </ul>
                     <form  className={styles.form}>
-                        <label htmlFor="file">
-                            {msgError.map(msg => msg)}
-                            <input
-                                onChange={handleFiles}
-                                type="file"
-                                ref={inputFiles}
-                                name="file"
-                                id="file"
-                            />
-                        </label>
-                        <label htmlFor="message">
-                            {files && <div>
-                                <img
-                                    style={{ width: "100px" }}
-                                    src={files ? URL.createObjectURL(files) : null}
-                                    alt=""
+                        <div className={styles.inputsContainer}>
+                            <label className={styles.labelInputFile} htmlFor="file">
+                                <AttachFileIcon className={styles.attachFileIcon}/>
+                                {msgError.map(msg => msg)}
+                                <input
+                                    onChange={handleFiles}
+                                    type="file"
+                                    ref={inputFiles}
+                                    name="file"
+                                    id="file"
+                                    className={styles.inputHidden}
                                 />
-                                 <button onClick={deleteFile}>Delete Image</button>
-                            </div>}
-                            <textarea
-                                value={message}
-                                onChange={handleMessage}
-                                // onKeyDown={autoSize}
-                                className={styles.textarea}
-                                name="message"
-                                id="message"
-                            ></textarea>
-                        </label>
-                        <button onClick={sendMessage} disabled={message === "" || isSending}>
-                            {isSending ? 'Sending...' : 'Send' }
-                        </button>
+                            </label>
+                            <label className={styles.labelMessage} htmlFor="message">
+                                {files && <div>
+                                    <img
+                                        style={{ width: "100px" }}
+                                        src={files ? URL.createObjectURL(files) : null}
+                                        alt=""
+                                    />
+                                     <button onClick={deleteFile}>Delete Image</button>
+                                </div>}
+                                <textarea
+                                    value={message}
+                                    onChange={handleMessage}
+                                    onKeyDown={autoSize}
+                                    className={styles.textarea}
+                                    name="message"
+                                    id="message"
+                                    placeholder='Enter your message...'
+                                ></textarea>
+                            </label>
+                            <button className={styles.sendMessageButton} onClick={sendMessage} disabled={message === "" || isSending}>
+                                {isSending ? 'Sending...' : 'Send' }
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

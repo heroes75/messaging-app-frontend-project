@@ -26,6 +26,7 @@
     display: flex;
     flex-direction: column;
     justify-content:  end;
+    gap: .8em;
 }
 
 .messageHead * {
@@ -97,7 +98,7 @@
 }
 
 .message {
-    max-width: 80%;
+    max-width: 60%;
     padding: 10px 7px;
     background-color: var(--bg-two);
     border-radius: 10px;
@@ -125,17 +126,6 @@
     font-size: .7rem;
 }
 
-.form {
-    /* align-self: end; */
-}
-
-.textarea {
-    resize: none;
-    min-height: 60px;
-    max-height: 300px;
-    width: 200px;
-    field-sizing: content;
-}
 
 .right {
     align-self: end;
@@ -153,12 +143,107 @@
     background-color: var(--date-in-message-bg);
     color: var(--text-one);
     border-radius: 7px;
-
+    
 }
 
-.img {
+.form {
+    align-self: center;
     width: 100%;
+    height: stretch;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    position: sticky;
+    bottom: 0;
+}
+
+/* inputsContainer:active {
+    border: 5px solid red;
+} */
+
+.inputsContainer {
+    height: stretch;
+    display: grid;
+    grid-template-columns: 50px auto 50px;
+    /* justify-content: space-between; */
+    /* align-items: center; */
+    background-color: white;
+    gap: 10px;
+    border-radius: 30px;
+    box-shadow: 0px 0px 7px var(--text-one), -0px -0px 7px var(--text-one);
+    width: 70%;
+} 
+
+.labelMessage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    justify-self: center;
+}
+
+
+.textarea {
+    resize: none;
+    /* height: 50px; */
+    max-height: 120px;
+    width: stretch;
+    /* min-width: 100px; */
+    /* min-block-size: 10%; */
+    /* min-inline-size: 40%; */
+    /* max-inline-size: 50%; */
+    /* padding: 12px 5px; */
+    font-size: 2em;
+    border: 30px;
+    /* field-sizing: content; */
+    border: 2px solid red;
+    outline: 0;
+    justify-self: center;
+    align-self: center;
+
+    /* vertical-align: middle; */
+    
+    /* flex-grow: 2; */
+    /* text-align: center; */
+}
+
+/* .textarea:focus {
+    border: 3px solid var(--text-one);
+    } */
+    
+    .inputsContainer:has(.textarea:focus) {
+        outline: 5px double var(--text-one);
+    }
+    
+    .img {
+        width: 100%;
         height: auto;
+    }
+    
+    .inputHidden {
+        display: none;
+        opacity: 0;
+        width: o;
+        height: 0;
+    }
+    
+    .labelInputFile {
+        background-color: white;
+        text-align: start;
+        display: flex;
+        border-radius: 30px;
+    }
+    
+    .attachFileIcon {
+        justify-self: center;
+        align-self: center;
+    }
+.sendMessageButton {
+    flex-shrink: 2;
+    text-align: end;
+    align-self: end;
+
 }
 
 @media (max-width: 850px) {

@@ -154,7 +154,7 @@ main {
         justify-content: space-around;
         /* justify-content: center; */
     }
-    .ul * {
+    .ul > * {
         height: 100%;
         /* min-width: 42px; */
         /* padding: 0 14px; */
@@ -165,4 +165,9 @@ main {
         width: 100px;
 
     }
+
+    .notificationCounter {
+        top: 10%;
+    }
+    
 }
