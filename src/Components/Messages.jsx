@@ -7,6 +7,7 @@ import VideoCallIcon from '../assets/videoCallIcon.svg?react'
 import VideoCallIcon2 from '../assets/videoCallIcon2.svg?react'
 import ArrowBackIcon from '../assets/arrowBackIcon.svg?react'
 import AttachFileIcon from '../assets/attach_file.svg?react'
+import SendMessageIcon from '../assets/sendMessageIcon.svg?react'
 import { differenceInCalendarDays, format, formatDistance } from "date-fns";
 
 
@@ -122,7 +123,7 @@ export default function Messages() {
      
     function autoSize(e) {
         const el = e.target
-        el.style.cssText = 'height: auto; padding: 10px 0 0 0';
+        el.style.cssText = 'height: 50px; padding: 10px 0 10px 0';
         el.style.height = el.scrollHeight + 'px';
     }
 
@@ -315,7 +316,8 @@ export default function Messages() {
                                 ></textarea>
                             </label>
                             <button className={styles.sendMessageButton} onClick={sendMessage} disabled={message === "" || isSending}>
-                                {isSending ? 'Sending...' : 'Send' }
+                                <SendMessageIcon style={{fill: (message === "" || isSending) ? "gray" : '#f22248'}} />
+                                {/* {isSending ? 'Sending...' : 'Send' } */}
                             </button>
                         </div>
                     </form>
